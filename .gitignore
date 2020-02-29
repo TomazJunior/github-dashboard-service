@@ -1,0 +1,4 @@
+node_modules
+.serverless
+serverless.config.local.yml
+yarn-error.log

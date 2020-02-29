@@ -1,0 +1,35 @@
+service: apigateway-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: ${self:custom.currentStage}
+  logRetentionInDays: 30
+  timeout: 30
+
+custom:
+  defaultStage: dev
+  currentStage: ${opt:stage, self:custom.defaultStage}
+  apiGatewayName: apigateway-${self:custom.currentStage}
+  
+resources:
+  Resources:
+    ApiGateway:
+      Type: "AWS::ApiGateway::RestApi"
+      Properties:
+        Description: "GitHub Dashboard API Gateway"
+        Name: ${self:custom.apiGatewayName}
+  Outputs:
+    ApiGatewayId:
+      Value:
+        Ref: ApiGateway
+      Export:
+        Name: ApiGatewayIdExport-${self:custom.currentStage}
+    ApiGatewayRootResourceId:
+      Value:
+        Fn::GetAtt:
+          - ApiGateway
+          - RootResourceId
+      Export:
+        Name: ApiGatewayRootResourceExport-${self:custom.currentStage}

@@ -1,0 +1,16 @@
+{
+  "name": "apigateway-service",
+  "version": "1.0.0",
+  "description": "This service is in charge of creating a shared api gateway",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless": "^1.64.0",
+    "serverless-offline": "^5.12.1"
+  },
+  "scripts": {
+    "deploy": "serverless deploy --verbose"
+  },
+  "author": "",
+  "license": "ISC"
+}

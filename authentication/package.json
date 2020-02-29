@@ -1,0 +1,20 @@
+{
+  "name": "apigateway-authentication-service",
+  "version": "1.0.0",
+  "description": "This service is in charge of the authentication",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "lambda-api": "^0.10.5"
+  },
+  "devDependencies": {
+    "serverless": "^1.64.0",
+    "serverless-offline": "^5.12.1"
+  },
+  "scripts": {
+    "start": "serverless offline start -r us-east-1 --stage local",
+    "deploy": "serverless deploy --verbose"
+  },
+  "author": "",
+  "license": "ISC"
+}
