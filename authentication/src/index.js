@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
     console.log('authentication.handler.login', 'process started');
     const { githubClientId, githubClientSecretId } = process.env;
     const { body } = req;
-    const { data } = await axios.post(`https://github.com/login/oauth/access_token?client_id=${githubClientId}&code=${body.code}11&client_secret=${githubClientSecretId}`);
+    const { data } = await axios.post(`https://github.com/login/oauth/access_token?client_id=${githubClientId}&code=${body.code}&client_secret=${githubClientSecretId}`);
     const searchParams = new URLSearchParams(data);
     console.log('authentication.handler.login', 'searchParams', searchParams);
     const parsedData = Array.from(searchParams).reduce((previous, [key, value]) => {
