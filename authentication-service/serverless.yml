@@ -41,7 +41,7 @@ functions:
     handler: src/index.handler
     events:
       - http:
-          path: /github-dashboard/auth/login
+          path: /auth/login
           method: post
           cors: true 
 

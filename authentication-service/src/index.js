@@ -16,7 +16,7 @@ exports.handler = async (event, context) => {
     next();
   });
 
-  api.post('/github-dashboard/auth/login', async (req, res) => {
+  api.post('/auth/login', async (req, res) => {
     console.log('authentication.handler.login', 'process started');
     const { githubClientId, githubClientSecretId } = process.env;
     const { body } = req;
