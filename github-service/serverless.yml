@@ -1,0 +1,43 @@
+service: github-dashboard-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "*"    
+  stage: ${self:custom.currentStage}
+  logRetentionInDays: 30
+  timeout: 30
+  environment:
+    region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
+  apiGateway:
+    restApiId: ${cf:apigateway-service-dev.ApiGatewayId}
+    restApiRootResourceId: ${cf:apigateway-service-dev.ApiGatewayRootResourceId}
+
+custom:
+  defaultStage: dev
+  currentStage: ${opt:stage, self:custom.defaultStage}
+  serverless-offline:
+    port: 5005
+
+functions:
+  GITHUB-DASHBOARD-SERVICE:
+    name: 'GITHUB-DASHBOARD-SERVICE_${self:custom.currentStage}'
+    description: Wraper for github api
+    handler: src/index.handler
+    events:
+      - http:
+          path: /github/{github+}
+          method: any
+          cors: true                 
+plugins:
+ - serverless-offline
