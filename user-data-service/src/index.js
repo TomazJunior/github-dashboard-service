@@ -3,6 +3,7 @@ const axios = require('axios');
 const DynamoDBService = require('./services/dynamodb.service');
 
 const initializeDashboard = require('./dashboard/dashboard.router');
+const initializeCard = require('./card/card.router');
 
 exports.handler = async (event, context) => {
   const router = require('lambda-api')({
@@ -34,6 +35,7 @@ exports.handler = async (event, context) => {
   });
 
   await initializeDashboard(router);
-  
+  await initializeCard(router);
+
   return router.run(event, context);
 }

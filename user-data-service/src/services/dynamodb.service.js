@@ -1,7 +1,6 @@
 'use strict';
 const AWS = require('aws-sdk');
 const dynogels = require('dynogels');
-// const { Dashboard } = require('../shared/model/dynamodb.model');
 
 class DynamoDBService {
   constructor(logger) {

@@ -15,6 +15,25 @@ const Dashboard = dynogels.define(process.env.dashboardsTableName, {
   tableName: process.env.dashboardsTableName
 });
 
+const CardSchema = {
+  id: dynogels.types.uuid(),
+  dashboardId: joi.string().required(),
+  title: joi.string().allow(''),
+  email: joi.string().required(),
+  type: joi.object().required(),
+  repository: joi.object().required(),
+  filter: joi.object().required(),
+};
+
+const Card = dynogels.define(process.env.cardsTableName, {
+  hashKey: 'dashboardId',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: CardSchema,
+  tableName: process.env.cardsTableName
+});
+
 module.exports = {
-  Dashboard
+  Dashboard,
+  Card
 };

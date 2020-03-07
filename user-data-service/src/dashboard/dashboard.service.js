@@ -30,11 +30,25 @@ class DashboardService {
                         this.logger.debug('DashboardService.get', 'process failed');
                         return reject(err);
                     };
-                    resolve(data.Items);
+                    resolve(data.Items.map((i) => i.get()));
                     this.logger.debug('DashboardService.get', 'process completed');
                 });
         });
     }
+
+  async getOne(email, id) {
+    this.logger.debug('DashboardService.get', 'process started');
+    return new Promise((resolve, reject) => {
+      return Dashboard.get(email, id, (err, data) => {
+        if (err) {
+          this.logger.debug('DashboardService.get', 'process failed');
+          return reject(err);
+        };
+        resolve(data && data.get());
+        this.logger.debug('DashboardService.get', 'process completed');
+      });
+    });
+  }
 
     async update(email, id, properties) {
         this.logger.debug('DashboardService.update', 'process started');
@@ -51,7 +65,7 @@ class DashboardService {
     }
 
     async remove(email, id) {
-        this.logger.debug('DashboardService.remove', `process started e: ${email} id: ${id}}`);
+        this.logger.debug('DashboardService.remove', `process started`);
         return new Promise((resolve, reject) => {
             return Dashboard.destroy(email, id, {ReturnValues: 'ALL_OLD'}, (err, data) => {
                 if (err) {

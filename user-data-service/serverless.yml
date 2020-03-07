@@ -20,6 +20,7 @@ provider:
   environment:
     region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
     dashboardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
+    cardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cardsTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
@@ -67,6 +68,32 @@ resources:
             AttributeName: "id"
             KeyType: "RANGE"                     
         BillingMode: PAY_PER_REQUEST      
-
+    CardsTableName:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cardsTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: "dashboardId"
+            AttributeType: "S"
+          -
+            AttributeName: "id"
+            AttributeType: "S"                  
+        KeySchema:
+          -
+            AttributeName: "dashboardId"
+            KeyType: "HASH"
+          -
+            AttributeName: "id"
+            KeyType: "RANGE"  
+        GlobalSecondaryIndexes:
+          - IndexName: CardIdIndex
+            KeySchema:
+              - 
+                AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL                        
+        BillingMode: PAY_PER_REQUEST 
 plugins:
  - serverless-offline
