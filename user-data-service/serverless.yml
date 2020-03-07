@@ -1,0 +1,72 @@
+service: user-data-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "*"    
+  stage: ${self:custom.currentStage}
+  logRetentionInDays: 30
+  timeout: 30
+  environment:
+    region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
+    dashboardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
+    dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
+    dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
+    dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
+    LoggerLevel: ${file(./config/serverless.config.${opt:stage,self:custom.defaultStage}.yml):LoggerLevel}
+    LoggerStack: ${file(./config/serverless.config.${opt:stage,self:custom.defaultStage}.yml):LoggerStack}    
+  apiGateway:
+    restApiId: ${cf:apigateway-service-dev.ApiGatewayId}
+    restApiRootResourceId: ${cf:apigateway-service-dev.ApiGatewayRootResourceId}
+
+custom:
+  defaultStage: dev
+  currentStage: ${opt:stage, self:custom.defaultStage}
+  serverless-offline:
+    port: 5006
+
+functions:
+  USER-DATA-SERVICE:
+    name: 'USER-DATA_${self:custom.currentStage}'
+    description: Maintain user data
+    handler: src/index.handler
+    events:
+      - http:
+          path: /user/{proxy+}
+          method: any
+          cors: true
+
+resources:
+  Resources:
+    DashboardsTableName:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: "id"
+            AttributeType: "S"
+          -
+            AttributeName: "email"
+            AttributeType: "S"                  
+        KeySchema:
+          -
+            AttributeName: "id"
+            KeyType: "HASH"
+          -
+            AttributeName: "email"
+            KeyType: "RANGE"                      
+        BillingMode: PAY_PER_REQUEST      
+
+plugins:
+ - serverless-offline

@@ -1,0 +1,23 @@
+{
+  "name": "user-data-service",
+  "version": "1.0.0",
+  "description": "This service is in charge of the user data",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.635.0",
+    "axios": "^0.19.2",
+    "dynogels": "^9.1.0",
+    "joi": "^14.3.1",
+    "lambda-api": "^0.10.5"
+  },
+  "devDependencies": {
+    "serverless": "^1.65.0",
+    "serverless-offline": "^5.12.1"
+  },
+  "scripts": {
+    "start": "serverless offline start -r us-east-1 --stage local",
+    "deploy": "serverless deploy --verbose"
+  },
+  "author": "",
+  "license": "ISC"
+}
