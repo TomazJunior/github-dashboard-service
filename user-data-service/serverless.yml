@@ -54,18 +54,18 @@ resources:
         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
         AttributeDefinitions:
           -
-            AttributeName: "id"
+            AttributeName: "email"
             AttributeType: "S"
           -
-            AttributeName: "email"
+            AttributeName: "id"
             AttributeType: "S"                  
         KeySchema:
           -
-            AttributeName: "id"
+            AttributeName: "email"
             KeyType: "HASH"
           -
-            AttributeName: "email"
-            KeyType: "RANGE"                      
+            AttributeName: "id"
+            KeyType: "RANGE"                     
         BillingMode: PAY_PER_REQUEST      
 
 plugins:

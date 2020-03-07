@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
     next();
   });
 
-  initializeDashboard(router);
-
+  await initializeDashboard(router);
+  
   return router.run(event, context);
 }

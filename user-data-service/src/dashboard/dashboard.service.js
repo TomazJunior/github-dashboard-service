@@ -1,4 +1,5 @@
 const DynamoDBService = require('../services/dynamodb.service');
+const Dashboard = require('../shared/model/dynamodb.model').Dashboard;
 
 class DashboardService {
 
@@ -6,12 +7,63 @@ class DashboardService {
         this.logger = logger;
     }
 
-    async getAll(email) {
-        this.logger.debug('DashboardService', 'process started');
-        const dynamoDBService = new DynamoDBService(this.logger);
-        const dashboards = await dynamoDBService.scan(process.env.dashboardsTableName);
-        this.logger.debug('DashboardService', 'process completed');
-        return dashboards;
+    async add(dashboard) {
+        this.logger.debug('DashboardService.add', 'process started');
+        return new Promise((resolve, reject) => {
+            return dashboard.save((err) => {
+                if (err) {
+                    this.logger.debug('DashboardService.add', 'process failed');
+                    return reject(err);
+                };
+                resolve(dashboard);
+                this.logger.debug('DashboardService.add', 'process completed');
+            });
+        });
+    }
+
+    async get(email) {
+        this.logger.debug('DashboardService.get', 'process started');
+        return new Promise((resolve, reject) => {
+            return Dashboard.query(email)
+                .exec((err, data) => {
+                    if (err) {
+                        this.logger.debug('DashboardService.get', 'process failed');
+                        return reject(err);
+                    };
+                    resolve(data.Items);
+                    this.logger.debug('DashboardService.get', 'process completed');
+                });
+        });
+    }
+
+    async update(email, id, properties) {
+        this.logger.debug('DashboardService.update', 'process started');
+        return new Promise((resolve, reject) => {
+            return Dashboard.update({...properties, id, email}, (err, data) => {
+                if (err) {
+                    this.logger.debug('DashboardService.update', 'process failed');
+                    return reject(err);
+                };
+                resolve(data);
+                this.logger.debug('DashboardService.update', 'process completed');
+            });
+        });
+    }
+
+    async remove(email, id) {
+        this.logger.debug('DashboardService.remove', `process started e: ${email} id: ${id}}`);
+        return new Promise((resolve, reject) => {
+            return Dashboard.destroy(email, id, {ReturnValues: 'ALL_OLD'}, (err, data) => {
+                if (err) {
+                    this.logger.debug('DashboardService.remove', 'process failed');
+                    return reject(err);
+                };
+                resolve({
+                    deleted: !!data
+                });
+                this.logger.debug('DashboardService.remove', 'process completed');
+            });
+        });
     }
 };
 

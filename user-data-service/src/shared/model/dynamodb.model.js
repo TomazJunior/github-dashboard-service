@@ -2,23 +2,19 @@ const dynogels = require('dynogels');
 const joi = require('joi');
 
 const DashboardSchema = {
-  id: joi.string().required(),
+  id: dynogels.types.uuid(),
   email: joi.string().required(),
   title: joi.string().required()
 };
 
 const Dashboard = dynogels.define(process.env.dashboardsTableName, {
-  hashKey: 'id',
-  rangeKey: 'email',
+  hashKey: 'email',
+  rangeKey: 'id',
   timestamps: true,
   schema: DashboardSchema,
-  tableName: process.env.dashboardsTableName,
-  indexes: [
-      { hashKey: 'email', name: 'emailIndex', type: 'global' }
-  ]
+  tableName: process.env.dashboardsTableName
 });
 
 module.exports = {
-  DashboardSchema,
   Dashboard
 };
