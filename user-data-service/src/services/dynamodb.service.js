@@ -64,7 +64,6 @@ class DynamoDBService {
   async createTables() {
     return new Promise((resolve, reject) => {
       dynogels.createTables((error, data) => {
-        this.logger.debug('error' + error + 'data' + data);
         if (error) {
           this.logger.error(error);
           reject(new Error('DynamoDB: Error creating tables. ' + error));

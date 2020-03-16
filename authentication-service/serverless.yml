@@ -23,7 +23,9 @@ provider:
     githubClientSecretId: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubClientSecretId}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
-    dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
+    dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}
+    userDataServiceEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):userDataServiceEndpoint}
+    githubServiceEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubServiceEndpoint}
   apiGateway:
     restApiId: ${cf:apigateway-service-dev.ApiGatewayId}
     restApiRootResourceId: ${cf:apigateway-service-dev.ApiGatewayRootResourceId}
@@ -44,38 +46,6 @@ functions:
           path: /auth/login
           method: post
           cors: true 
-
-# resources:
-#   Resources:
-#     UsersTable:
-#       Type: "AWS::DynamoDB::Table"
-#       Properties:
-#         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
-#         AttributeDefinitions:
-#           - AttributeName: "email"
-#             AttributeType: "S"
-#           - AttributeName: "name"
-#             AttributeType: "S" 
-#           - AttributeName: "token"
-#             AttributeType: "S" 
-#           - AttributeName: "expiresAt"
-#             AttributeType: "S"                                           
-#         KeySchema:
-#           - AttributeName: "email"
-#             KeyType: "HASH"
-#         BillingMode: PAY_PER_REQUEST  
-#     TokenTable:
-#       Type: "AWS::DynamoDB::Table"
-#       Properties:
-#         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):tokenTableName}
-#         AttributeDefinitions:
-#           - AttributeName: "token"
-#             AttributeType: "S"
-#           - AttributeName: "expiresAt"
-#             AttributeType: "S"              
-#         KeySchema:
-#           - AttributeName: "token"
-#             KeyType: "HASH"
-#         BillingMode: PAY_PER_REQUEST                    
+           
 plugins:
  - serverless-offline

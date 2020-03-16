@@ -1,5 +1,7 @@
 'use strict';
 const axios = require('axios');
+const { upsertUser } = require('./userDataService');
+const { getAuthenticatedUser } = require('./githubService');
 
 exports.handler = async (event, context) => {
   const api = require('lambda-api')();
@@ -16,13 +18,6 @@ exports.handler = async (event, context) => {
     next();
   });
 
-  //TODO: move to another file
-  const getHeaders = (accessToken) => ({headers: {'Authorization': `Bearer ${accessToken}`}});
-  const getUserData = async (accessToken) => {
-    const { data } = await axios.get('https://api.github.com/user', {...getHeaders(accessToken)});    
-    return data;
-  };
-
   api.post('/auth/login', async (req, res) => {
     console.log('authentication.handler.login', 'process started');
     const { githubClientId, githubClientSecretId } = process.env;
@@ -38,12 +33,13 @@ exports.handler = async (event, context) => {
       throw new Error(parsedData.error);
     }
 
-    // TODO: store data in a table
-    const userData = await getUserData(parsedData.access_token);
+    const authenticatedUser = await getAuthenticatedUser(parsedData.access_token);
+    const userData = await upsertUser(parsedData.access_token, authenticatedUser);
     
     console.log('authentication.handler.login', 'process completed');
     return {
       ...parsedData,
+      ...authenticatedUser,
       ...userData
     };
   });

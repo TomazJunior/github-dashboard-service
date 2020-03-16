@@ -2,6 +2,8 @@
 environmentTag: dev
 region: us-east-1
 dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
+userDataServiceEndpoint: https://c4iezpk8af.execute-api.us-east-1.amazonaws.com/dev/user
+githubServiceEndpoint: https://c4iezpk8af.execute-api.us-east-1.amazonaws.com/dev/github
 usersTableName: users-dev
 tokenTableName: token-dev
 dynamoDBaccessKey: ""

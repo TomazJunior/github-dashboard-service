@@ -1,6 +1,7 @@
 'use strict';
 const axios = require('axios');
 
+//TODO: update to multiple files (router, handler, service)
 exports.handler = async (event, context) => {
   const api = require('lambda-api')();
 
@@ -26,6 +27,15 @@ exports.handler = async (event, context) => {
     });
     console.log('github.service.handler.user.repos', 'process completed');
     return response;
+  });
+
+  api.get('/github/user', async (req, res) => {
+    console.log('github.service.handler.user', 'process started');
+    const { headers: { authorization } } = req;
+    const { data } = await axios.get('https://api.github.com/user', { headers: { authorization } });
+    const { name, email, type, location, avatar_url } = data;
+    console.log('github.service.handler.user', 'process completed');
+    return { name, email, type, location, avatarUrl: avatar_url };
   });
 
   api.get('/github/repos/:owner/:repo/pulls', async (req, res) => {

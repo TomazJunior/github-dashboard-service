@@ -21,6 +21,7 @@ provider:
     region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
     dashboardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
     cardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cardsTableName}
+    usersTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
@@ -95,5 +96,19 @@ resources:
             Projection:
               ProjectionType: ALL                        
         BillingMode: PAY_PER_REQUEST 
+    UsersTableName:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: "email"
+            AttributeType: "S"            
+        KeySchema:
+          -
+            AttributeName: "email"
+            KeyType: "HASH"                
+        BillingMode: PAY_PER_REQUEST    
+
 plugins:
  - serverless-offline
