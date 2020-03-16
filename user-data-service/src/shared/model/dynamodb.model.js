@@ -34,19 +34,25 @@ const Card = dynogels.define(process.env.cardsTableName, {
 });
 
 const TokenSchema = {
+  email: joi.string().required(),
   token: joi.string().required(),
-  createdAt: joi.date().default(Date.now, 'time of creation'),
   destroyedAt: joi.date()
 }
+
+const Token = dynogels.define(process.env.tokensTableName, {
+  hashKey: 'token',
+  rangeKey: 'email',
+  timestamps: true,
+  schema: TokenSchema,
+  tableName: process.env.tokensTableName
+});
 
 const UserSchema = {
   email: joi.string().required(),
   name: joi.string(),
   type: joi.string(),
   location: joi.string(),
-  avatarUrl: joi.string(),
-  currentToken: joi.string(),
-  tokens: joi.array().items(TokenSchema)
+  avatarUrl: joi.string()
 };
 
 const User = dynogels.define(process.env.usersTableName, {
@@ -59,5 +65,6 @@ const User = dynogels.define(process.env.usersTableName, {
 module.exports = {
   Dashboard,
   Card,
+  Token,
   User
 };

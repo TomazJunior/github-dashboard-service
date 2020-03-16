@@ -22,6 +22,7 @@ provider:
     dashboardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
     cardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cardsTableName}
     usersTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
+    tokensTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):tokensTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
@@ -109,6 +110,25 @@ resources:
             AttributeName: "email"
             KeyType: "HASH"                
         BillingMode: PAY_PER_REQUEST    
+    TokensTableName:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):tokensTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: "token"
+            AttributeType: "S"       
+          -
+            AttributeName: "email"
+            AttributeType: "S"                   
+        KeySchema:
+          -
+            AttributeName: "token"
+            KeyType: "HASH"   
+          -
+            AttributeName: "email"
+            KeyType: "RANGE"                          
+        BillingMode: PAY_PER_REQUEST         
 
 plugins:
  - serverless-offline

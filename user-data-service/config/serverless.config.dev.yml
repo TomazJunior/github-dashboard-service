@@ -5,6 +5,7 @@ dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
 dashboardsTableName: dashboards-dev
 cardsTableName: cards-dev
 usersTableName: users-dev
+tokensTableName: tokens-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
 LoggerLevel: debug
