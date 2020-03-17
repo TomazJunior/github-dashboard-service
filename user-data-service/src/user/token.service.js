@@ -22,23 +22,40 @@ class TokenService {
 
 
     async getOne(token, email) {
-      this.logger.debug('TokenService.get', 'process started');
+      this.logger.debug('TokenService.getOne', 'process started');
       return new Promise((resolve, reject) => {
         return Token.get(token, email, (err, data) => {
           if (err) {
-            this.logger.debug('TokenService.get', 'process failed');
+            this.logger.debug('TokenService.getOne', 'process failed');
             return reject(err);
           };
           resolve(data && data.get());
-          this.logger.debug('TokenService.get', 'process completed');
+          this.logger.debug('TokenService.getOne', 'process completed');
         });
       });
+    }
+
+    async get(token) {
+        this.logger.debug('TokenService.get', 'process started -> ' + token);
+        return new Promise((resolve, reject) => {
+            return Token
+                .query(token)
+                .limit(1)
+                .exec((err, data) => {
+                    if (err) {
+                        this.logger.debug('TokenService.get', 'process failed');
+                        return reject(err);
+                    };
+                    resolve(data && data.Items.length && data.Items[0].get());
+                    this.logger.debug('TokenService.get', 'process completed');
+                });
+        });
     }
 
     async update(token, email, properties) {
       this.logger.debug('TokenService.update', 'process started');
       return new Promise((resolve, reject) => {
-          return User.update({...properties, token, email}, (err, data) => {
+          return Token.update({...properties, token, email}, (err, data) => {
               if (err) {
                   this.logger.debug('TokenService.update', 'process failed');
                   return reject(err);
@@ -52,7 +69,7 @@ class TokenService {
     async remove(token, email) {
         this.logger.debug('TokenService.remove', `process started`);
         return new Promise((resolve, reject) => {
-            return User.destroy(token, email, {ReturnValues: 'ALL_OLD'}, (err, data) => {
+            return Token.destroy(token, email, {ReturnValues: 'ALL_OLD'}, (err, data) => {
                 if (err) {
                     this.logger.debug('TokenService.remove', 'process failed');
                     return reject(err);

@@ -7,9 +7,14 @@ const initialize = (router) => {
         return userHandler.get(req, res);
     });
 
-    router.post('user/info', (req, res) => {
+    router.post('user/:email/login', (req, res) => {
         const userHandler = new UserHandler(req.log);
-        return userHandler.upsert(req, res);
+        return userHandler.login(req, res);
+    });
+
+    router.post('user/logout', async(req, res) => {
+        const userHandler = new UserHandler(req.log);
+        return userHandler.logout(req, res);
     });
 
 };

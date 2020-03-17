@@ -20,8 +20,8 @@ class UserHandler {
     req.log.debug('UserHandler.get', 'Process completed');
   }
 
-  async upsert(req, res) {
-    req.log.debug('UserHandler.upsert', 'Process started');
+  async login(req, res) {
+    req.log.debug('UserHandler.login', 'Process started');
     const { email } = req.body;
     const { authorization } = req.headers;
     const accessToken = authorization.replace('Bearer', '').trim();
@@ -29,11 +29,11 @@ class UserHandler {
     
     let response;
     if (userDB) {
-      req.log.debug('UserHandler.upsert', 'update user');
+      req.log.debug('UserHandler.login', 'update user');
       const updatedUserDB = await this.service.update(email, { ... req.body });
       response = new Response(updatedUserDB);
     } else {
-      req.log.debug('UserHandler.upsert', 'create user');
+      req.log.debug('UserHandler.login', 'create user');
       const user = new User({
         ...req.body,
         email
@@ -51,13 +51,33 @@ class UserHandler {
     }
 
     const dashboards = await this.dashboardService.get(email);
-    req.log.debug('UserHandler.upsert #dashboards:', dashboards.length);
+    req.log.debug('UserHandler.login #dashboards:', dashboards.length);
     if (!dashboards.length) {
       await this.dashboardService.add(new Dashboard({email}));
     }
 
     res.json(response);
-    req.log.debug('UserHandler.upsert', 'Process completed');
+    req.log.debug('UserHandler.login', 'Process completed');
+  }
+
+  async logout(req, res) {
+    req.log.debug('UserHandler.logout', 'Process started');
+    const { authorization } = req.headers;
+    const accessToken = authorization.replace('Bearer', '').trim();
+    const tokenDB = await this.tokenService.get(accessToken);
+    if (tokenDB) {
+      if (tokenDB.destroyedAt) {
+        req.log.debug('UserHandler.logout', `Token ${accessToken} is already destroyed`);
+        req.log.debug('UserHandler.logout', 'Process completed');
+        return new Response();
+      }
+      await this.tokenService.update(accessToken, tokenDB.email, {destroyedAt: new Date()});
+      res.json(new Response());
+      req.log.debug('UserHandler.logout', 'Process completed');
+    } else {
+      req.log.debug('UserHandler.logout', 'Process failed');
+      throw new Error(`Invalid token`);
+    }
   }
 }
 

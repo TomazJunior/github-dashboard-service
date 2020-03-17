@@ -23,14 +23,14 @@ class UserService {
     async getOne(email) {
         this.logger.debug('UserService.getOne', 'process started');
         return new Promise((resolve, reject) => {
-        return User.get(email, (err, data) => {
-            if (err) {
-            this.logger.debug('UserService.getOne', 'process failed');
-            return reject(err);
-            };
-            resolve(data && data.get());
-            this.logger.debug('UserService.getOne', 'process completed');
-        });
+            return User.get(email, (err, data) => {
+                if (err) {
+                this.logger.debug('UserService.getOne', 'process failed');
+                return reject(err);
+                };
+                resolve(data && data.get());
+                this.logger.debug('UserService.getOne', 'process completed');
+            });
         });
     }
 

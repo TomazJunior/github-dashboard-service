@@ -46,6 +46,9 @@ functions:
           path: /auth/login
           method: post
           cors: true 
-           
+      - http:
+          path: /auth/logout
+          method: post
+          cors: true            
 plugins:
  - serverless-offline

@@ -1,6 +1,6 @@
 'use strict';
 const axios = require('axios');
-const { upsertUser } = require('./userDataService');
+const { login, logout } = require('./userDataService');
 const { getAuthenticatedUser } = require('./githubService');
 
 exports.handler = async (event, context) => {
@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
     }
 
     const authenticatedUser = await getAuthenticatedUser(parsedData.access_token);
-    const userData = await upsertUser(parsedData.access_token, authenticatedUser);
+    const userData = await login(parsedData.access_token, authenticatedUser);
     
     console.log('authentication.handler.login', 'process completed');
     return {
@@ -42,6 +42,13 @@ exports.handler = async (event, context) => {
       ...authenticatedUser,
       ...userData
     };
+  });
+
+  api.post('/auth/logout', async (req, res) => {
+    console.log('authentication.handler.logout', 'process started');
+    const { data } = await logout(req.headers);
+    console.log('authentication.handler.logout', 'process completed');
+    return data;
   });
 
   return api.run(event, context);
