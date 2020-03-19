@@ -17,6 +17,7 @@ const Dashboard = dynogels.define(process.env.dashboardsTableName, {
 
 const CardSchema = {
   id: dynogels.types.uuid(),
+  position: joi.number(),
   dashboardId: joi.string().required(),
   title: joi.string().allow(''),
   email: joi.string().required(),

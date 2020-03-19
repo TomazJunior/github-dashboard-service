@@ -35,6 +35,23 @@ class CardHandler {
     req.log.debug('CardHandler.add', 'Process completed');
   }
 
+  async updateInBatch(req, res) {
+    req.log.debug('CardHandler.updateInBatch', 'Process started');
+    const { email, dashboardId, id } = req.params;
+    const { cards } = req.body;
+    const cardsDB = await this.service.get(email, dashboardId);
+    if (cardsDB.length !== cards.length) {
+      throw new Error(`There are cards that do not belong to ${email}`);
+    }
+    for (const card of cards) {
+      await this.service.update(email, dashboardId, card.id, { ...card });
+    }
+    res.json(new Response({
+      cards: cards.map((card)=>card.id)
+    }));
+    req.log.debug('CardHandler.updateInBatch', 'Process completed');
+  }
+
   async update(req, res) {
     req.log.debug('CardHandler.update', 'Process started');
     const { email, dashboardId, id } = req.params;

@@ -17,6 +17,11 @@ const initialize = (router) => {
         return cardHandler.update(req, res);
     });
 
+    router.put('user/:email/dashboard/:dashboardId/cards', (req, res) => {
+        const cardHandler = new CardHandler(req.log);
+        return cardHandler.updateInBatch(req, res);
+    });
+
     router.delete('user/:email/dashboard/:dashboardId/card/:id', (req, res) => {
         const cardHandler = new CardHandler(req.log);
         return cardHandler.remove(req, res);
