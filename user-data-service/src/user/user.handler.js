@@ -27,19 +27,15 @@ class UserHandler {
     const accessToken = authorization.replace('Bearer', '').trim();
     const userDB = await this.service.getOne(email);
     
-    let response;
     if (userDB) {
       req.log.debug('UserHandler.login', 'update user');
-      const updatedUserDB = await this.service.update(email, { ... req.body });
-      response = new Response(updatedUserDB);
+      await this.service.update(email, { ... req.body });
     } else {
       req.log.debug('UserHandler.login', 'create user');
-      const user = new User({
+      await this.service.add(new User({
         ...req.body,
         email
-      });
-      const userDB = await this.service.add(user);
-      response = new Response(userDB);
+      }));
     }
 
     const token = await this.tokenService.getOne(accessToken, email);
@@ -53,10 +49,14 @@ class UserHandler {
     const dashboards = await this.dashboardService.get(email);
     req.log.debug('UserHandler.login #dashboards:', dashboards.length);
     if (!dashboards.length) {
-      await this.dashboardService.add(new Dashboard({email}));
+      const dashboardDB = await this.dashboardService.add(new Dashboard({email}));
+      await this.service.update(email, {
+        dashboardId: dashboardDB.id
+      });
     }
 
-    res.json(response);
+    const user = await this.service.getOne(email);
+    res.json(new Response(user));
     req.log.debug('UserHandler.login', 'Process completed');
   }
 

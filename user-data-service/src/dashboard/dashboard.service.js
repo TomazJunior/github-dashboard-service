@@ -10,12 +10,12 @@ class DashboardService {
     async add(dashboard) {
         this.logger.debug('DashboardService.add', 'process started');
         return new Promise((resolve, reject) => {
-            return dashboard.save((err) => {
+            return dashboard.save((err, data) => {
                 if (err) {
                     this.logger.debug('DashboardService.add', 'process failed');
                     return reject(err);
                 };
-                resolve(dashboard);
+                resolve(data.get());
                 this.logger.debug('DashboardService.add', 'process completed');
             });
         });

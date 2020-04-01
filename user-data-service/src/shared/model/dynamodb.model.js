@@ -53,7 +53,8 @@ const UserSchema = {
   name: joi.string(),
   type: joi.string(),
   location: joi.string(),
-  avatarUrl: joi.string()
+  avatarUrl: joi.string(),
+  dashboardId: joi.string().allow(''),
 };
 
 const User = dynogels.define(process.env.usersTableName, {
