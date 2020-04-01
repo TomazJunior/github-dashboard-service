@@ -20,6 +20,18 @@ class UserHandler {
     req.log.debug('UserHandler.get', 'Process completed');
   }
 
+  async updateDashboard(req, res) {
+    req.log.debug('UserHandler.updateDashboard', 'Process started');
+    const { email, dashboardId } = req.params;
+    const user = await this.service.update(email, {
+      dashboardId 
+    });
+    res.json(new Response({
+      dashboardId: user.dashboardId
+    }));
+    req.log.debug('UserHandler.updateDashboard', 'Process completed');
+  }
+
   async login(req, res) {
     req.log.debug('UserHandler.login', 'Process started');
     const { email } = req.body;

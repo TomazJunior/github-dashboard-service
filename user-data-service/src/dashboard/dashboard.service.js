@@ -36,19 +36,19 @@ class DashboardService {
         });
     }
 
-  async getOne(email, id) {
-    this.logger.debug('DashboardService.get', 'process started');
-    return new Promise((resolve, reject) => {
-      return Dashboard.get(email, id, (err, data) => {
-        if (err) {
-          this.logger.debug('DashboardService.get', 'process failed');
-          return reject(err);
-        };
-        resolve(data && data.get());
-        this.logger.debug('DashboardService.get', 'process completed');
-      });
-    });
-  }
+    async getOne(email, id) {
+        this.logger.debug('DashboardService.get', 'process started');
+        return new Promise((resolve, reject) => {
+            return Dashboard.get(email, id, (err, data) => {
+                if (err) {
+                    this.logger.debug('DashboardService.get', 'process failed');
+                    return reject(err);
+                };
+                resolve(data && data.get());
+                this.logger.debug('DashboardService.get', 'process completed');
+            });
+        });
+    }
 
     async update(email, id, properties) {
         this.logger.debug('DashboardService.update', 'process started');

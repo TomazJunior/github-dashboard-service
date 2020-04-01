@@ -42,7 +42,7 @@ class UserService {
                     this.logger.debug('UserService.update', 'process failed');
                     return reject(err);
                 };
-                resolve(data);
+                resolve(data && data.get());
                 this.logger.debug('UserService.update', 'process completed');
             });
         });
