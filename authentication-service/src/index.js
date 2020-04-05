@@ -32,10 +32,8 @@ exports.handler = async (event, context) => {
     if (parsedData.error) {
       throw new Error(parsedData.error);
     }
-
     const authenticatedUser = await getAuthenticatedUser(parsedData.access_token);
     const userData = await login(parsedData.access_token, authenticatedUser);
-    
     console.log('authentication.handler.login', 'process completed');
     return {
       ...parsedData,

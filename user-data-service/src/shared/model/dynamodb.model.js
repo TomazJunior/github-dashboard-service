@@ -52,8 +52,8 @@ const UserSchema = {
   email: joi.string().required(),
   name: joi.string(),
   type: joi.string(),
-  location: joi.string(),
-  avatarUrl: joi.string(),
+  location: joi.string().allow(null),
+  avatarUrl: joi.string().allow(null),
   dashboardId: joi.string().allow(''),
 };
 
