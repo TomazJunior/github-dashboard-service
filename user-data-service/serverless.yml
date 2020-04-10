@@ -108,7 +108,10 @@ resources:
             AttributeType: "S"               
           -
             AttributeName: "sourceId"
-            AttributeType: "S"            
+            AttributeType: "S"     
+          -
+            AttributeName: "userId"
+            AttributeType: "S"                     
         KeySchema:
           -
             AttributeName: "id"
