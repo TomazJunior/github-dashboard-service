@@ -35,9 +35,9 @@ exports.handler = async (event, context) => {
     console.log('github.service.handler.user', 'process started');
     const { headers: { authorization } } = req;
     const { data } = await axios.get('https://api.github.com/user', { headers: { authorization } });
-    const { name, email, type, location, avatar_url } = data;
+    const { id, name, email, type, location, avatar_url } = data;
     console.log('github.service.handler.user', 'process completed');
-    return { name, email, type, location, avatarUrl: avatar_url };
+    return { id, name, email, type, location, avatarUrl: avatar_url };
   });
 
   api.get('/github/repos/:owner/:repo/pulls', async (req, res) => {

@@ -10,18 +10,18 @@ class DashboardHandler {
 
   async get(req, res) {
     req.log.debug('DashboardHandler.get', 'Process started');
-    const { email } = req.params;
-    const dashboards = await this.service.get(email);
+    const { userId } = req.params;
+    const dashboards = await this.service.get(userId);
     res.json(new Response(dashboards));
     req.log.debug('DashboardHandler.get', 'Process completed');
   }
 
   async add(req, res) {
     req.log.debug('DashboardHandler.add', 'Process started');
-    const { email } = req.params;
+    const { userId } = req.params;
     const dashboard = new Dashboard({
       ...req.body,
-      email
+      userId
     });
     const dashboardDB = await this.service.add(dashboard);
     res.json(new Response(dashboardDB));
@@ -30,16 +30,16 @@ class DashboardHandler {
 
   async update(req, res) {
     req.log.debug('DashboardHandler.update', 'Process started');
-    const { email, id } = req.params;
-    const dashboardDB = await this.service.update(email, id, { ... req.body });
+    const { userId, id } = req.params;
+    const dashboardDB = await this.service.update(userId, id, { ... req.body });
     res.json(new Response(dashboardDB));
     req.log.debug('DashboardHandler.update', 'Process completed');
   }
 
   async remove(req, res) {
     req.log.debug('DashboardHandler.remove', 'Process started');
-    const { email, id } = req.params;
-    const dashboardDB = await this.service.remove(email, id);
+    const { userId, id } = req.params;
+    const dashboardDB = await this.service.remove(userId, id);
     res.json(new Response(dashboardDB));
     req.log.debug('DashboardHandler.remove', 'Process completed');
   }

@@ -21,10 +21,10 @@ class DashboardService {
         });
     }
 
-    async get(email) {
+    async get(userId) {
         this.logger.debug('DashboardService.get', 'process started');
         return new Promise((resolve, reject) => {
-            return Dashboard.query(email)
+            return Dashboard.query(userId)
                 .exec((err, data) => {
                     if (err) {
                         this.logger.debug('DashboardService.get', 'process failed');
@@ -36,10 +36,10 @@ class DashboardService {
         });
     }
 
-    async getOne(email, id) {
+    async getOne(userId, id) {
         this.logger.debug('DashboardService.get', 'process started');
         return new Promise((resolve, reject) => {
-            return Dashboard.get(email, id, (err, data) => {
+            return Dashboard.get(userId, id, (err, data) => {
                 if (err) {
                     this.logger.debug('DashboardService.get', 'process failed');
                     return reject(err);
@@ -50,10 +50,10 @@ class DashboardService {
         });
     }
 
-    async update(email, id, properties) {
+    async update(userId, id, properties) {
         this.logger.debug('DashboardService.update', 'process started');
         return new Promise((resolve, reject) => {
-            return Dashboard.update({...properties, id, email}, (err, data) => {
+            return Dashboard.update({...properties, id, userId}, (err, data) => {
                 if (err) {
                     this.logger.debug('DashboardService.update', 'process failed');
                     return reject(err);
@@ -64,10 +64,10 @@ class DashboardService {
         });
     }
 
-    async remove(email, id) {
+    async remove(userId, id) {
         this.logger.debug('DashboardService.remove', `process started`);
         return new Promise((resolve, reject) => {
-            return Dashboard.destroy(email, id, {ReturnValues: 'ALL_OLD'}, (err, data) => {
+            return Dashboard.destroy(userId, id, {ReturnValues: 'ALL_OLD'}, (err, data) => {
                 if (err) {
                     this.logger.debug('DashboardService.remove', 'process failed');
                     return reject(err);

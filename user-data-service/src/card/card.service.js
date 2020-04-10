@@ -6,7 +6,7 @@ class CardService {
     this.logger = logger;
   }
 
-  async get(email, dashboardId) {
+  async get(userId, dashboardId) {
     this.logger.debug('CardService.get', 'process started ' + dashboardId);
     return new Promise((resolve, reject) => {
       return Card.query(dashboardId)
@@ -17,7 +17,7 @@ class CardService {
             };
             resolve(data.Items
               .map((i) => i.get())
-              .filter((i) => i.email === email));
+              .filter((i) => i.userId === userId));
             this.logger.debug('CardService.get', 'process completed');
           });
     });
@@ -52,10 +52,10 @@ class CardService {
     });
   }
 
-  async update(email, dashboardId, id, properties) {
+  async update(userId, dashboardId, id, properties) {
     this.logger.debug('CardService.update', 'process started');
     return new Promise((resolve, reject) => {
-      return Card.update({...properties, email, dashboardId, id}, (err, data) => {
+      return Card.update({...properties, userId, dashboardId, id}, (err, data) => {
         if (err) {
           this.logger.debug('CardService.update', 'process failed');
           return reject(err);
@@ -66,7 +66,7 @@ class CardService {
     });
   }
 
-  async remove(email, dashboardId, id) {
+  async remove(userId, dashboardId, id) {
     this.logger.debug('CardService.remove', `process started`);
     return new Promise(async (resolve, reject) => {
       return Card.destroy(dashboardId, id, {ReturnValues: 'ALL_OLD'}, (err, data) => {

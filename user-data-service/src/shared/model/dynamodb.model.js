@@ -1,14 +1,15 @@
 const dynogels = require('dynogels');
 const joi = require('joi');
+const { GITHUB_SOURCE_ID } = require('../sources');
 
 const DashboardSchema = {
   id: dynogels.types.uuid(),
-  email: joi.string().required(),
+  userId: joi.string().required(),
   title: joi.string().default('dashboard #1')
 };
 
 const Dashboard = dynogels.define(process.env.dashboardsTableName, {
-  hashKey: 'email',
+  hashKey: 'userId',
   rangeKey: 'id',
   timestamps: true,
   schema: DashboardSchema,
@@ -20,7 +21,7 @@ const CardSchema = {
   position: joi.number(),
   dashboardId: joi.string().required(),
   title: joi.string().allow(''),
-  email: joi.string().required(),
+  userId: joi.string().required(),
   type: joi.object().required(),
   repository: joi.object().required(),
   filter: joi.object().required(),
@@ -35,38 +36,61 @@ const Card = dynogels.define(process.env.cardsTableName, {
 });
 
 const TokenSchema = {
-  email: joi.string().required(),
   token: joi.string().required(),
+  userId: joi.string().required(),
+  sourceId: joi.string().default(GITHUB_SOURCE_ID),
   destroyedAt: joi.date()
 }
 
 const Token = dynogels.define(process.env.tokensTableName, {
   hashKey: 'token',
-  rangeKey: 'email',
+  rangeKey: 'userId',
   timestamps: true,
   schema: TokenSchema,
   tableName: process.env.tokensTableName
 });
 
+const UserSourceSchema = {
+  id: joi.string().required(),
+  sourceId: joi.string().default(GITHUB_SOURCE_ID),
+  userId: joi.string().required()
+};
+
+const UserSource = dynogels.define(process.env.userSourcesTableName, {
+  hashKey: 'id',
+  rangeKey: 'sourceId',
+  timestamps: true,
+  schema: UserSourceSchema,
+  tableName: process.env.userSourcesTableName,
+  indexes: [
+    { hashKey: 'userId', name: 'UserIdIndex', type: 'global' }
+  ]
+});
+
 const UserSchema = {
-  email: joi.string().required(),
+  id: dynogels.types.uuid(),
+  email: joi.string().allow(null),
   name: joi.string(),
   type: joi.string(),
   location: joi.string().allow(null),
   avatarUrl: joi.string().allow(null),
-  dashboardId: joi.string().allow(''),
+  dashboardId: joi.string().allow(null),
 };
 
 const User = dynogels.define(process.env.usersTableName, {
-  hashKey: 'email',
+  hashKey: 'id',
   timestamps: true,
   schema: UserSchema,
-  tableName: process.env.usersTableName
+  tableName: process.env.usersTableName,
+  indexes: [
+    { hashKey: 'email', name: 'EmailIndex', type: 'global' }
+]
 });
 
 module.exports = {
-  Dashboard,
   Card,
+  Dashboard,
   Token,
-  User
+  User,
+  UserSource
 };

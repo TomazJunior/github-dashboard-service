@@ -1,29 +1,32 @@
 const Response = require('../shared/response');
 const UserService = require('./user.service');
+const UserSourceService = require('./userSource.service');
 const TokenService = require('./token.service');
 const DashboardService = require('../dashboard/dashboard.service');
-const { Dashboard, User, Token } = require('../shared/model/dynamodb.model');
+const { Dashboard, User, Token, UserSource } = require('../shared/model/dynamodb.model');
+const { GITHUB_SOURCE_ID } = require('../shared/sources');
 
 class UserHandler {
   
   constructor(logger) {
     this.service = new UserService(logger);
+    this.userSourceService = new UserSourceService(logger);
     this.dashboardService = new DashboardService(logger);
     this.tokenService = new TokenService(logger);
   }
 
   async get(req, res) {
     req.log.debug('UserHandler.get', 'Process started');
-    const { email } = req.params;
-    const user = await this.service.getOne(email);
+    const { userId } = req.params;
+    const user = await this.service.getOne(userId);
     res.json(new Response(user));
     req.log.debug('UserHandler.get', 'Process completed');
   }
 
   async updateDashboard(req, res) {
     req.log.debug('UserHandler.updateDashboard', 'Process started');
-    const { email, dashboardId } = req.params;
-    const user = await this.service.update(email, {
+    const { userId, dashboardId } = req.params;
+    const user = await this.service.update(userId, {
       dashboardId 
     });
     res.json(new Response({
@@ -34,40 +37,46 @@ class UserHandler {
 
   async login(req, res) {
     req.log.debug('UserHandler.login', 'Process started');
-    const { email } = req.body;
+    const id = req.body.id.toString();
     const { authorization } = req.headers;
     const accessToken = authorization.replace('Bearer', '').trim();
-    const userDB = await this.service.getOne(email);
     
-    if (userDB) {
+    const userSourceDB = await this.userSourceService.getOne(id, GITHUB_SOURCE_ID);
+   
+    let userDB;
+    if (userSourceDB) {
       req.log.debug('UserHandler.login', 'update user');
-      await this.service.update(email, { ... req.body });
+      userDB = await this.service.getOne(userSourceDB.userId);
+      await this.service.update(userDB.id, { ... req.body });
     } else {
       req.log.debug('UserHandler.login', 'create user');
-      await this.service.add(new User({
+      userDB = await this.service.add(new User({
         ...req.body,
-        email
+        id: undefined
       }));
+      req.log.debug('UserHandler.login', 'create user source');
+      await this.userSourceService.add(new UserSource({ id, userId: userDB.id }))
     }
-
-    const token = await this.tokenService.getOne(accessToken, email);
+    
+    const userId = userDB.id;
+    const token = await this.tokenService.getOne(accessToken, userId);
     if (!token) {
       await this.tokenService.add(new Token({
-        email, 
+        userId,
         token: accessToken
       }));
     }
 
-    const dashboards = await this.dashboardService.get(email);
+    const dashboards = await this.dashboardService.get(userId);
     req.log.debug('UserHandler.login #dashboards:', dashboards.length);
     if (!dashboards.length) {
-      const dashboardDB = await this.dashboardService.add(new Dashboard({email}));
-      await this.service.update(email, {
+      const dashboardDB = await this.dashboardService.add(new Dashboard({userId}));
+      await this.service.update(userId, {
         dashboardId: dashboardDB.id
       });
     }
 
-    const user = await this.service.getOne(email);
+    const user = await this.service.getOne(userId);
     res.json(new Response(user));
     req.log.debug('UserHandler.login', 'Process completed');
   }
@@ -83,7 +92,7 @@ class UserHandler {
         req.log.debug('UserHandler.logout', 'Process completed');
         return new Response();
       }
-      await this.tokenService.update(accessToken, tokenDB.email, {destroyedAt: new Date()});
+      await this.tokenService.update(accessToken, tokenDB.userId, {destroyedAt: new Date()});
       res.json(new Response());
       req.log.debug('UserHandler.logout', 'Process completed');
     } else {

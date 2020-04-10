@@ -22,6 +22,7 @@ provider:
     dashboardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
     cardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cardsTableName}
     usersTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
+    userSourcesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):userSourcesTableName}
     tokensTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):tokensTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
@@ -57,14 +58,14 @@ resources:
         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
         AttributeDefinitions:
           -
-            AttributeName: "email"
+            AttributeName: "userId"
             AttributeType: "S"
           -
             AttributeName: "id"
             AttributeType: "S"                  
         KeySchema:
           -
-            AttributeName: "email"
+            AttributeName: "userId"
             KeyType: "HASH"
           -
             AttributeName: "id"
@@ -97,19 +98,58 @@ resources:
             Projection:
               ProjectionType: ALL                        
         BillingMode: PAY_PER_REQUEST 
+    UserSourcesTableName:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):userSourcesTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: "id"
+            AttributeType: "S"               
+          -
+            AttributeName: "sourceId"
+            AttributeType: "S"            
+        KeySchema:
+          -
+            AttributeName: "id"
+            KeyType: "HASH"     
+          -
+            AttributeName: "sourceId"
+            KeyType: "RANGE"                         
+        BillingMode: PAY_PER_REQUEST    
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - 
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
     UsersTableName:
       Type: "AWS::DynamoDB::Table"
       Properties:
         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
         AttributeDefinitions:
           -
+            AttributeName: "id"
+            AttributeType: "S"               
+          -
             AttributeName: "email"
             AttributeType: "S"            
         KeySchema:
           -
-            AttributeName: "email"
+            AttributeName: "id"
             KeyType: "HASH"                
         BillingMode: PAY_PER_REQUEST    
+        GlobalSecondaryIndexes:
+          - IndexName: EmailIndex
+            KeySchema:
+              - 
+                AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
     TokensTableName:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -119,16 +159,15 @@ resources:
             AttributeName: "token"
             AttributeType: "S"       
           -
-            AttributeName: "email"
+            AttributeName: "userId"
             AttributeType: "S"                   
         KeySchema:
           -
             AttributeName: "token"
             KeyType: "HASH"   
           -
-            AttributeName: "email"
+            AttributeName: "userId"
             KeyType: "RANGE"                          
         BillingMode: PAY_PER_REQUEST         
-
 plugins:
  - serverless-offline

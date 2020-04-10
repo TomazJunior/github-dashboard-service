@@ -5,10 +5,10 @@ const getHeaders = (accessToken) => ({headers: {'Authorization': `Bearer ${acces
 
 const login = async (accessToken, user) => {
   console.log('userDataService.login', 'process started');
-  const { data: { data } } = await axios.post(`${process.env.userDataServiceEndpoint}/${user.email}/login`, {...user}, {...getHeaders(accessToken)});
-  const { email, name, type, location, avatarUrl, dashboardId } = data;
+  const { data: { data } } = await axios.post(`${process.env.userDataServiceEndpoint}/login`, {...user}, {...getHeaders(accessToken)});
+  const { id, email, name, type, location, avatarUrl, dashboardId } = data;
   console.log('userDataService.login', 'process completed');
-  return { email, name, type, location, avatarUrl, dashboardId };
+  return { id, email, name, type, location, avatarUrl, dashboardId };
 };
 
 const logout = async (headers) => 

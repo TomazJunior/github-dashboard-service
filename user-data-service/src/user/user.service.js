@@ -14,16 +14,16 @@ class UserService {
                     this.logger.debug('UserService.add', 'process failed');
                     return reject(err);
                 };
-                resolve(user);
+                resolve(user.get());
                 this.logger.debug('UserService.add', 'process completed');
             });
         });
     }
 
-    async getOne(email) {
+    async getOne(id) {
         this.logger.debug('UserService.getOne', 'process started');
         return new Promise((resolve, reject) => {
-            return User.get(email, (err, data) => {
+            return User.get(id, (err, data) => {
                 if (err) {
                 this.logger.debug('UserService.getOne', 'process failed');
                 return reject(err);
@@ -34,10 +34,10 @@ class UserService {
         });
     }
 
-    async update(email, properties) {
+    async update(id, properties) {
         this.logger.debug('UserService.update', 'process started');
         return new Promise((resolve, reject) => {
-            return User.update({...properties, email}, (err, data) => {
+            return User.update({...properties, id}, (err, data) => {
                 if (err) {
                     this.logger.debug('UserService.update', 'process failed');
                     return reject(err);
@@ -48,10 +48,10 @@ class UserService {
         });
     }
 
-    async remove(email) {
+    async remove(id) {
         this.logger.debug('UserService.remove', `process started`);
         return new Promise((resolve, reject) => {
-            return User.destroy(email, {ReturnValues: 'ALL_OLD'}, (err, data) => {
+            return User.destroy(id, {ReturnValues: 'ALL_OLD'}, (err, data) => {
                 if (err) {
                     this.logger.debug('UserService.remove', 'process failed');
                     return reject(err);

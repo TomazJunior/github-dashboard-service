@@ -21,10 +21,10 @@ class TokenService {
     }
 
 
-    async getOne(token, email) {
+    async getOne(token, userId) {
       this.logger.debug('TokenService.getOne', 'process started');
       return new Promise((resolve, reject) => {
-        return Token.get(token, email, (err, data) => {
+        return Token.get(token, userId, (err, data) => {
           if (err) {
             this.logger.debug('TokenService.getOne', 'process failed');
             return reject(err);
@@ -52,10 +52,10 @@ class TokenService {
         });
     }
 
-    async update(token, email, properties) {
+    async update(token, userId, properties) {
       this.logger.debug('TokenService.update', 'process started');
       return new Promise((resolve, reject) => {
-          return Token.update({...properties, token, email}, (err, data) => {
+          return Token.update({...properties, token, userId}, (err, data) => {
               if (err) {
                   this.logger.debug('TokenService.update', 'process failed');
                   return reject(err);
@@ -66,10 +66,10 @@ class TokenService {
       });
     }
 
-    async remove(token, email) {
+    async remove(token, userId) {
         this.logger.debug('TokenService.remove', `process started`);
         return new Promise((resolve, reject) => {
-            return Token.destroy(token, email, {ReturnValues: 'ALL_OLD'}, (err, data) => {
+            return Token.destroy(token, userId, {ReturnValues: 'ALL_OLD'}, (err, data) => {
                 if (err) {
                     this.logger.debug('TokenService.remove', 'process failed');
                     return reject(err);

@@ -5,6 +5,7 @@ dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
 userDataServiceEndpoint: https://c4iezpk8af.execute-api.us-east-1.amazonaws.com/dev/user
 githubServiceEndpoint: https://c4iezpk8af.execute-api.us-east-1.amazonaws.com/dev/github
 usersTableName: users-dev
+userSourcesTableName: user-sources-dev
 tokenTableName: token-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
