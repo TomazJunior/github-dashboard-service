@@ -1,5 +1,6 @@
 'use strict';
 const axios = require('axios');
+const { decrypt } = require('./encrypt.service');
 
 //TODO: update to multiple files (router, handler, service)
 exports.handler = async (event, context) => {
@@ -22,7 +23,7 @@ exports.handler = async (event, context) => {
   api.get('/github/user/repos', async (req, res) => {
     console.log('github.service.handler.user.repos', 'process started');
     const { headers: { authorization } } = req;
-    const { data } = await axios.get('https://api.github.com/user/repos', { headers: { authorization } });
+    const { data } = await axios.get('https://api.github.com/user/repos', getHeader(authorization));
     const response = data.map(repo => {
       const { id, name, full_name, html_url, owner: { login } } = repo;
       return { id, name, full_name, html_url, owner: { login } };
@@ -34,6 +35,7 @@ exports.handler = async (event, context) => {
   api.get('/github/user', async (req, res) => {
     console.log('github.service.handler.user', 'process started');
     const { headers: { authorization } } = req;
+    // /github/user needs to have the original authorization
     const { data } = await axios.get('https://api.github.com/user', { headers: { authorization } });
     const { id, name, email, type, location, avatar_url } = data;
     console.log('github.service.handler.user', 'process completed');
@@ -45,7 +47,7 @@ exports.handler = async (event, context) => {
     const { headers: { authorization } } = req;
     const { owner, repo} = req.params;
     const { state } = req.query;
-    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls?state=${state || 'all'}`, { headers: { authorization } });
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls?state=${state || 'all'}`, getHeader(authorization));
     const response = data.map(pr => {
       const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = pr;
       return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };
@@ -53,6 +55,17 @@ exports.handler = async (event, context) => {
     console.log('github.service.handler.repos.pulls', 'process completed');
     return response;
   });
+
+  const getHeader = (authorization) => {
+    console.log('github.service.getHeader', 'process started');
+    const header = { 
+      headers: { 
+        authorization: `Bearer ${decrypt(authorization.replace('Bearer', '').trim())}`
+      }
+    };
+    console.log('github.service.getHeader', 'process completed');
+    return header;
+  }
 
   return api.run(event, context);
 }

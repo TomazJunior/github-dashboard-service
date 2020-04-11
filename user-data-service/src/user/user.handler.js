@@ -5,6 +5,7 @@ const TokenService = require('./token.service');
 const DashboardService = require('../dashboard/dashboard.service');
 const { Dashboard, User, Token, UserSource } = require('../shared/model/dynamodb.model');
 const { GITHUB_SOURCE_ID } = require('../shared/sources');
+const { encrypt } = require('../services/encrypt.service')
 
 class UserHandler {
   
@@ -39,7 +40,7 @@ class UserHandler {
     req.log.debug('UserHandler.login', 'Process started');
     const id = req.body.id.toString();
     const { authorization } = req.headers;
-    const accessToken = authorization.replace('Bearer', '').trim();
+    const externalToken = authorization.replace('Bearer', '').trim();
     
     const userSourceDB = await this.userSourceService.getOne(id, GITHUB_SOURCE_ID);
    
@@ -59,11 +60,14 @@ class UserHandler {
     }
     
     const userId = userDB.id;
-    const token = await this.tokenService.getOne(accessToken, userId);
-    if (!token) {
+    let internalToken = '';
+    const tokenDB = await this.tokenService.getOneByExternalToken(externalToken, userId);
+    if (!tokenDB) {
+      internalToken = encrypt(externalToken);
       await this.tokenService.add(new Token({
         userId,
-        token: accessToken
+        externalToken,
+        token: internalToken
       }));
     }
 
@@ -77,7 +81,10 @@ class UserHandler {
     }
 
     const user = await this.service.getOne(userId);
-    res.json(new Response(user));
+    res.json(new Response({
+      ...user,
+      token: internalToken
+    }));
     req.log.debug('UserHandler.login', 'Process completed');
   }
 

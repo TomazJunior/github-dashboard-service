@@ -18,6 +18,7 @@ provider:
   logRetentionInDays: 30
   timeout: 30
   environment:
+    cipherKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cipherKey}
     region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
     dashboardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dashboardsTableName}
     cardsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cardsTableName}
@@ -152,7 +153,6 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-
     TokensTableName:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -163,7 +163,10 @@ resources:
             AttributeType: "S"       
           -
             AttributeName: "userId"
-            AttributeType: "S"                   
+            AttributeType: "S"      
+          -
+            AttributeName: "externalToken"
+            AttributeType: "S"                             
         KeySchema:
           -
             AttributeName: "token"
@@ -171,6 +174,14 @@ resources:
           -
             AttributeName: "userId"
             KeyType: "RANGE"                          
-        BillingMode: PAY_PER_REQUEST         
+        BillingMode: PAY_PER_REQUEST    
+        GlobalSecondaryIndexes:
+          - IndexName: ExternalTokenIndex
+            KeySchema:
+              - 
+                AttributeName: externalToken
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL             
 plugins:
  - serverless-offline

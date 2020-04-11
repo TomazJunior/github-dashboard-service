@@ -19,6 +19,7 @@ provider:
   timeout: 30
   environment:
     region: ${file(./config/serverless.config.${self:custom.currentStage}.yml):region}
+    cipherKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):cipherKey}
   apiGateway:
     restApiId: ${cf:apigateway-service-dev.ApiGatewayId}
     restApiRootResourceId: ${cf:apigateway-service-dev.ApiGatewayRootResourceId}

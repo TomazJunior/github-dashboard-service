@@ -38,6 +38,7 @@ const Card = dynogels.define(process.env.cardsTableName, {
 const TokenSchema = {
   token: joi.string().required(),
   userId: joi.string().required(),
+  externalToken: joi.string().required(),
   sourceId: joi.string().default(GITHUB_SOURCE_ID),
   destroyedAt: joi.date()
 }
@@ -47,7 +48,10 @@ const Token = dynogels.define(process.env.tokensTableName, {
   rangeKey: 'userId',
   timestamps: true,
   schema: TokenSchema,
-  tableName: process.env.tokensTableName
+  tableName: process.env.tokensTableName,
+  indexes: [
+    { hashKey: 'externalToken', name: 'ExternalTokenIndex', type: 'global' }
+  ]
 });
 
 const UserSourceSchema = {

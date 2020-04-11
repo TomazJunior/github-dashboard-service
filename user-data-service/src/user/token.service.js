@@ -1,4 +1,5 @@
 const Token = require('../shared/model/dynamodb.model').Token;
+const crypto = require('crypto');
 
 class TokenService {
 
@@ -20,6 +21,26 @@ class TokenService {
         });
     }
 
+    async getOneByExternalToken(externalToken) {
+        this.logger.debug('TokenService.getOneByExternalToken', 'process started');
+        return new Promise((resolve, reject) => {
+            Token
+            .query(externalToken)
+            .usingIndex('ExternalTokenIndex')
+            .loadAll()
+            .exec((err, data) => {
+                if (err) {
+                    this.logger.debug('TokenService.getOneByExternalToken', 'process failed');
+                    return reject(err);
+                };
+                console.log('data ->', data);
+                console.log('typeof data ->', typeof data);
+                console.log('stringify data ->', JSON.stringify(data));
+                resolve(data && data.Items && data.Items.length && data.Items[0].get());
+                this.logger.debug('TokenService.getOneByExternalToken', 'process completed');
+            });
+        });        
+    }
 
     async getOne(token, userId) {
       this.logger.debug('TokenService.getOne', 'process started');
