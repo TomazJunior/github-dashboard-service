@@ -42,12 +42,12 @@ exports.handler = async (event, context) => {
     return { id, name, email, type, location, avatarUrl: avatar_url };
   });
 
-  api.get('/github/repos/:owner/:repo/pulls', async (req, res) => {
+  api.get('/github/repos/:owner/:repo/:entity', async (req, res) => {
     console.log('github.service.handler.repos.pulls', 'process started');
     const { headers: { authorization } } = req;
-    const { owner, repo} = req.params;
+    const { owner, repo, entity} = req.params;
     const { state } = req.query;
-    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls?state=${state || 'all'}`, getHeader(authorization));
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/${entity}?state=${state || 'all'}`, getHeader(authorization));
     const response = data.map(pr => {
       const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = pr;
       return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };

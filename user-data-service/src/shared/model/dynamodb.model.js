@@ -74,7 +74,7 @@ const UserSource = dynogels.define(process.env.userSourcesTableName, {
 const UserSchema = {
   id: dynogels.types.uuid(),
   email: joi.string().allow(null),
-  name: joi.string(),
+  name: joi.string().allow(null),
   type: joi.string(),
   location: joi.string().allow(null),
   avatarUrl: joi.string().allow(null),
