@@ -1,3 +1,4 @@
+const CryptoError = require('./cryptoError');
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc';
 const key = process.env.cipherKey;
@@ -13,9 +14,14 @@ function encrypt(text) {
 
 function decrypt(text) {
   console.log('encrypt.service.decrypt', 'process started');
-  let decipher = crypto.createDecipher('aes-128-cbc', key);
-  let decrypted = decipher.update(text, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
+  let decipher = '';
+  try {
+    let decipher = crypto.createDecipher('aes-128-cbc', key);
+    decrypted = decipher.update(text, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+  } catch (error) {
+    throw new CryptoError(error.message);
+  }
   console.log('encrypt.service.decrypt', 'process completed');
   return decrypted;
 }
