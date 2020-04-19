@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
   });
 
   api.get('/github/repos/:owner/:repo/:entity', async (req, res) => {
-    console.log('github.service.handler.repos.pulls', 'process started');
+    console.log('github.service.handler.repos.entity.pulls', 'process started');
     const { headers: { authorization } } = req;
     const { owner, repo, entity} = req.params;
     const { state } = req.query;
@@ -52,7 +52,7 @@ exports.handler = async (event, context) => {
       const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = pr;
       return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };
     });
-    console.log('github.service.handler.repos.pulls', 'process completed');
+    console.log('github.service.handler.repos.entity.pulls', 'process completed');
     return response;
   });
 
