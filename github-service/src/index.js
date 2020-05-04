@@ -48,8 +48,15 @@ exports.handler = async (event, context) => {
     const { owner, repo, entity} = req.params;
     const { state } = req.query;
     const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/${entity}?state=${state || 'all'}`, getHeader(authorization));
-    const response = data.map(pr => {
-      const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = pr;
+    const response = data
+    .filter(item => {
+      if (entity === 'issues') {
+        return !item.pull_request;
+      }
+      return true;
+    })
+    .map(item => {
+      const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = item;
       return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };
     });
     console.log('github.service.handler.repos.entity.pulls', 'process completed');
