@@ -24,7 +24,7 @@ const CardSchema = {
   userId: joi.string().required(),
   type: joi.object().required(),
   repository: joi.object().required(),
-  filter: joi.object().required(),
+  filter: joi.object().unknown(),
 };
 
 const Card = dynogels.define(process.env.cardsTableName, {

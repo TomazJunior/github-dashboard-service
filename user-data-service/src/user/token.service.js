@@ -33,9 +33,6 @@ class TokenService {
                     this.logger.debug('TokenService.getOneByExternalToken', 'process failed');
                     return reject(err);
                 };
-                console.log('data ->', data);
-                console.log('typeof data ->', typeof data);
-                console.log('stringify data ->', JSON.stringify(data));
                 resolve(data && data.Items && data.Items.length && data.Items[0].get());
                 this.logger.debug('TokenService.getOneByExternalToken', 'process completed');
             });

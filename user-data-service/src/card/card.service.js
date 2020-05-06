@@ -31,7 +31,6 @@ class CardService {
           this.logger.debug('CardService.getOne', 'process failed');
           return reject(err);
         };
-        console.log('data', data && data.get());
         resolve(data && data.get());
         this.logger.debug('CardService.getOne', 'process completed');
       });

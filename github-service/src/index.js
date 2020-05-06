@@ -56,21 +56,42 @@ exports.handler = async (event, context) => {
     return response;
   });
 
+  api.get('/github/repos/:owner/:repo/milestones', async (req, res) => {
+    console.log('github.service.handler.repos.milestones', 'process started');
+    const { headers: { authorization } } = req;
+    const { owner, repo, entity} = req.params;
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/milestones`, getHeader(authorization));
+    const response = data
+    .map(item => {
+      const { id, html_url, title, description, open_issues, closed_issues, state, created_at, updated_at, due_on, closed_at } = item;
+      return { id, html_url, title, description, open_issues, closed_issues, state, created_at, updated_at, due_on, closed_at };
+    });
+    console.log('github.service.handler.repos.milestones', 'process completed');
+    return response;
+  });
+
   api.get('/github/repos/:owner/:repo/:entity', async (req, res) => {
     console.log('github.service.handler.repos.entity', 'process started');
     const { headers: { authorization } } = req;
     const { owner, repo, entity} = req.params;
-    const { state, labels } = req.query;
+    const { state, labels, milestone } = req.query;
+    console.log('milestone=>', milestone);
     const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/issues?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`, getHeader(authorization));
     const response = data
     .filter(item => {
+      let isValid = true;
       if (entity === 'issues') {
-        return !item.pull_request;
+        isValid = !item.pull_request;
       }
       if (entity === 'pulls') {
-        return !!item.pull_request;
+        isValid = !!item.pull_request;
       }
-      return true;
+
+      if (isValid && milestone) {
+        isValid = item.milestone && milestone === item.milestone.title;
+      }
+
+      return isValid;
     })
     .map(item => {
       const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = item;
