@@ -42,12 +42,26 @@ exports.handler = async (event, context) => {
     return { id, name, email, type, location, avatarUrl: avatar_url };
   });
 
-  api.get('/github/repos/:owner/:repo/:entity', async (req, res) => {
-    console.log('github.service.handler.repos.entity.pulls', 'process started');
+  api.get('/github/repos/:owner/:repo/labels', async (req, res) => {
+    console.log('github.service.handler.repos.labels', 'process started');
     const { headers: { authorization } } = req;
     const { owner, repo, entity} = req.params;
-    const { state } = req.query;
-    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/${entity}?state=${state || 'all'}`, getHeader(authorization));
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/labels`, getHeader(authorization));
+    const response = data
+    .map(item => {
+      const { id, name, color, description } = item;
+      return { id, name, color, description };
+    });
+    console.log('github.service.handler.repos.labels', 'process completed');
+    return response;
+  });
+
+  api.get('/github/repos/:owner/:repo/:entity', async (req, res) => {
+    console.log('github.service.handler.repos.entity', 'process started');
+    const { headers: { authorization } } = req;
+    const { owner, repo, entity} = req.params;
+    const { state, labels } = req.query;
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/${entity}?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`, getHeader(authorization));
     const response = data
     .filter(item => {
       if (entity === 'issues') {
@@ -59,7 +73,7 @@ exports.handler = async (event, context) => {
       const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = item;
       return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };
     });
-    console.log('github.service.handler.repos.entity.pulls', 'process completed');
+    console.log('github.service.handler.repos.entity', 'process completed');
     return response;
   });
 
