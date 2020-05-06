@@ -61,11 +61,14 @@ exports.handler = async (event, context) => {
     const { headers: { authorization } } = req;
     const { owner, repo, entity} = req.params;
     const { state, labels } = req.query;
-    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/${entity}?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`, getHeader(authorization));
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/issues?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`, getHeader(authorization));
     const response = data
     .filter(item => {
       if (entity === 'issues') {
         return !item.pull_request;
+      }
+      if (entity === 'pulls') {
+        return !!item.pull_request;
       }
       return true;
     })
