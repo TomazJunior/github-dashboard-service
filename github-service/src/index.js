@@ -80,12 +80,11 @@ exports.handler = async (event, context) => {
       const { id, avatar_url, url, login } = item;
       return { id, avatar_url, url, login };
     });
-    
     const assignees = [];
     for (const item of response) {
       const assignee = { ...item };
       if (assignee.url) {
-        const { data } = await axios.get(assignee.url);
+        const { data } = await axios.get(assignee.url, getHeader(authorization));
         assignee.name = data.name;
       }
       assignees.push(assignee);
@@ -100,7 +99,6 @@ exports.handler = async (event, context) => {
     const { headers: { authorization } } = req;
     const { owner, repo, entity} = req.params;
     const { state, labels, milestone, assignees } = req.query;
-    console.log('assignees=>', assignees);
     const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/issues?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`, getHeader(authorization));
     const response = data
     .filter(item => {
