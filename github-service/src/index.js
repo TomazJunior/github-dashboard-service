@@ -70,12 +70,37 @@ exports.handler = async (event, context) => {
     return response;
   });
 
+  api.get('/github/repos/:owner/:repo/assignees', async (req, res) => {
+    console.log('github.service.handler.repos.assignees', 'process started');
+    const { headers: { authorization } } = req;
+    const { owner, repo, entity} = req.params;
+    const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/assignees`, getHeader(authorization));
+    const response = data
+    .map(item => {
+      const { id, avatar_url, url, login } = item;
+      return { id, avatar_url, url, login };
+    });
+    
+    const assignees = [];
+    for (const item of response) {
+      const assignee = { ...item };
+      if (assignee.url) {
+        const { data } = await axios.get(assignee.url);
+        assignee.name = data.name;
+      }
+      assignees.push(assignee);
+    }
+
+    console.log('github.service.handler.repos.assignees', 'process completed');
+    return assignees;
+  });
+
   api.get('/github/repos/:owner/:repo/:entity', async (req, res) => {
     console.log('github.service.handler.repos.entity', 'process started');
     const { headers: { authorization } } = req;
     const { owner, repo, entity} = req.params;
-    const { state, labels, milestone } = req.query;
-    console.log('milestone=>', milestone);
+    const { state, labels, milestone, assignees } = req.query;
+    console.log('assignees=>', assignees);
     const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/issues?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`, getHeader(authorization));
     const response = data
     .filter(item => {
@@ -89,6 +114,18 @@ exports.handler = async (event, context) => {
 
       if (isValid && milestone) {
         isValid = item.milestone && milestone === item.milestone.title;
+      }
+
+      if (isValid && assignees) {
+        if (!item.assignees || !item.assignees.length) {
+          isValid = false;
+        } else {
+          isValid = item.assignees.some((assignee) => {
+            return assignees
+              .split(',')
+              .find(login => login === assignee.login);
+          })
+        }
       }
 
       return isValid;
