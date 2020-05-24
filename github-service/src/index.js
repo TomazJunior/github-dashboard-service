@@ -38,7 +38,10 @@ exports.handler = async (event, context) => {
     const userId = req.headers['user-id'];
     const githubRequestService = new GithubRequestService(req.log);
 
-    const githubRequest = await githubRequestService.get(userId, url);
+    let githubRequest;
+    if (userId) {
+      githubRequest = await githubRequestService.get(userId, url);
+    }
     const result = await axios.get(
       url, 
       {
@@ -55,7 +58,7 @@ exports.handler = async (event, context) => {
 
     const response = prepareData(result.data);
     const { etag } = result.headers;
-    if (etag) {
+    if (etag && userId) {
       if (githubRequest) {
         await githubRequestService.update(userId, url, {
           etag,
