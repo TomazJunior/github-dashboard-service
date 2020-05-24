@@ -32,7 +32,7 @@ exports.handler = async (event, context) => {
     next();
   });
 
-  const githubRequester = async (req, url, prepareData)  => {
+  const githubRequester = async (req, url, prepareData, headers)  => {
     console.log('github.service.githubRequester', 'process started');
     const { headers: { authorization } } = req;
     const userId = req.headers['user-id'];
@@ -42,10 +42,11 @@ exports.handler = async (event, context) => {
     if (userId) {
       githubRequest = await githubRequestService.get(userId, url);
     }
+    headers = headers ? headers : getHeader(authorization, githubRequest && githubRequest.etag);
     const result = await axios.get(
       url, 
       {
-        ...getHeader(authorization, githubRequest && githubRequest.etag),
+        ...headers,
         validateStatus: (status) => {
           return status < 400
         }
@@ -98,7 +99,7 @@ exports.handler = async (event, context) => {
     const response = await githubRequester(req, url, (data) => {
       const { id, name, email, type, location, avatar_url } = data;
       return { id, name, email, type, location, avatarUrl: avatar_url };
-    });
+    }, { headers: { authorization }});
     console.log('github.service.handler.user', 'process completed');
     return response;
   });
