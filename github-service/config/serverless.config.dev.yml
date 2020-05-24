@@ -2,3 +2,7 @@
 environmentTag: dev
 region: us-east-1
 cipherKey: ""
+githubRequestsTableName: github-requests-dev
+dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
+dynamoDBaccessKey: ""
+dynamoDBaccessSecret: ""
