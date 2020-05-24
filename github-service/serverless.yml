@@ -43,8 +43,17 @@ functions:
       - http:
           path: /github/{proxy+}
           method: any
-          cors: true  
-
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 resources:
   Resources:
     GithubRequestsTableName:
