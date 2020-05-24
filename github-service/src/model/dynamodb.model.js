@@ -2,14 +2,14 @@ const dynogels = require('dynogels');
 const joi = require('joi');
 
 const GithubRequestSchema = {
-  userId: joi.string().required(),
+  token: joi.string().required(),
   key: joi.string().required(),
   etag: joi.string().required(),
   value: joi.any()
 };
 
 const GithubRequest = dynogels.define(process.env.githubRequestsTableName, {
-  hashKey: 'userId',
+  hashKey: 'token',
   rangeKey: 'key',
   timestamps: true,
   schema: GithubRequestSchema,

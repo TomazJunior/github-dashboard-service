@@ -21,10 +21,10 @@ class GithubRequestService {
     });
   }
 
-  async get(userId, key) {
+  async get(token, key) {
     this.logger.debug('GithubRequestService.get', 'process started');
     return new Promise((resolve, reject) => {
-      return GithubRequest.get(userId, key, (err, data) => {
+      return GithubRequest.get(token, key, (err, data) => {
         if (err) {
             this.logger.debug('GithubRequestService.get', 'process failed');
             return reject(err);
@@ -35,10 +35,10 @@ class GithubRequestService {
     });
   }
 
-  async update(userId, key, properties) {
+  async update(token, key, properties) {
     this.logger.debug('GithubRequestService.update', 'process started');
     return new Promise((resolve, reject) => {
-        return GithubRequest.update({...properties, userId, key}, (err, data) => {
+        return GithubRequest.update({...properties, token, key}, (err, data) => {
             if (err) {
                 this.logger.debug('GithubRequestService.update', 'process failed');
                 return reject(err);

@@ -62,14 +62,14 @@ resources:
         TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubRequestsTableName}
         AttributeDefinitions:
           -
-            AttributeName: "userId"
+            AttributeName: "token"
             AttributeType: "S"
           -
             AttributeName: "key"
             AttributeType: "S"                  
         KeySchema:
           -
-            AttributeName: "userId"
+            AttributeName: "token"
             KeyType: "HASH"
           -
             AttributeName: "key"

@@ -35,12 +35,11 @@ exports.handler = async (event, context) => {
   const githubRequester = async (req, url, prepareData, headers)  => {
     console.log('github.service.githubRequester', 'process started');
     const { headers: { authorization } } = req;
-    const userId = req.headers['user-id'];
     const githubRequestService = new GithubRequestService(req.log);
 
     let githubRequest;
-    if (userId) {
-      githubRequest = await githubRequestService.get(userId, url);
+    if (authorization) {
+      githubRequest = await githubRequestService.get(authorization, url);
     }
     headers = headers ? headers : getHeader(authorization, githubRequest && githubRequest.etag);
     const result = await axios.get(
@@ -59,15 +58,15 @@ exports.handler = async (event, context) => {
 
     const response = prepareData(result.data);
     const { etag } = result.headers;
-    if (etag && userId) {
+    if (etag && authorization) {
       if (githubRequest) {
-        await githubRequestService.update(userId, url, {
+        await githubRequestService.update(authorization, url, {
           etag,
           value: response
         });
       } else {
         await githubRequestService.add(new GithubRequest({
-          userId,
+          token: authorization,
           key: url,
           etag,
           value: response
