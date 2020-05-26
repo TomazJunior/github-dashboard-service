@@ -7,6 +7,11 @@ const initialize = (router) => {
         return dashboardHandler.get(req, res);
     });
 
+    router.get('user/:userId/dashboard/:id', async(req, res) => {
+        const dashboardHandler = new DashboardHandler(req.log);
+        return dashboardHandler.getOne(req, res);
+    });
+
     router.post('user/:userId/dashboard', (req, res) => {
         const dashboardHandler = new DashboardHandler(req.log);
         return dashboardHandler.add(req, res);

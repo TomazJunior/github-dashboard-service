@@ -1,11 +1,13 @@
 const Response = require('../shared/response');
 const DashboardService = require('./dashboard.service');
+const CardService = require('../card/card.service');
 const Dashboard = require('../shared/model/dynamodb.model').Dashboard;
 
 class DashboardHandler {
   
   constructor(logger) {
     this.service = new DashboardService(logger);
+    this.cardService = new CardService(logger);
   }
 
   async get(req, res) {
@@ -14,6 +16,18 @@ class DashboardHandler {
     const dashboards = await this.service.get(userId);
     res.json(new Response(dashboards));
     req.log.debug('DashboardHandler.get', 'Process completed');
+  }
+
+  async getOne(req, res) {
+    req.log.debug('DashboardHandler.getOne', 'Process started');
+    const { userId, id } = req.params;
+    const dashboard = await this.service.getOne(userId, id);
+    let cards = [];
+    if (dashboard) {
+      cards = await this.cardService.get(userId, id);
+    }
+    res.json(new Response({...dashboard, cards: cards.length}));
+    req.log.debug('DashboardHandler.getOne', 'Process completed');
   }
 
   async add(req, res) {
