@@ -53,6 +53,7 @@ exports.handler = async (event, context) => {
     );
     if (githubRequest && result.status === 304) {
       console.log('github.service.githubRequester', 'process completed Not Modified');
+      console.log('githubRequest', githubRequest);
       return githubRequest.value;
     }
 
@@ -161,38 +162,54 @@ exports.handler = async (event, context) => {
     const { owner, repo, entity} = req.params;
     const { state, labels, milestone, assignees } = req.query;
     const url = `https://api.github.com/repos/${owner}/${repo}/issues?state=${state || 'all'}${labels ? `&labels=${labels}`: ''}`;
-    const response = await githubRequester(req, url, (data) => {
-      return data.filter(item => {
-        let isValid = true;
-        if (entity === 'issues') {
-          isValid = !item.pull_request;
-        }
-        if (entity === 'pulls') {
-          isValid = !!item.pull_request;
-        }
-  
-        if (isValid && milestone) {
-          isValid = item.milestone && milestone === item.milestone.title;
-        }
-  
-        if (isValid && assignees) {
-          if (!item.assignees || !item.assignees.length) {
-            isValid = false;
-          } else {
-            isValid = item.assignees.some((assignee) => {
-              return assignees
-                .split(',')
-                .find(login => login === assignee.login);
-            })
-          }
-        }
-        return isValid;
-      })
-      .map(item => {
-        const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = item;
-        return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };
+    const gitHubResponse = await githubRequester(req, url, (data) => {
+      return data.map(item => {
+        const { 
+          id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url }, 
+          pull_request, milestone, assignees 
+        } = item;
+        return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, 
+          user: { login, avatar_url },
+          pull_request: !!item.pull_request,
+          milestone: { 
+            title: milestone && milestone.title 
+          },
+          assignees: assignees.map(assignee => {
+            return {login: assignee.login};
+          })
+        };
       });
     });
+    
+    const response = gitHubResponse.filter(item => {
+      let isValid = true;
+      if (entity === 'issues') {
+        isValid = !item.pull_request;
+      }
+      if (entity === 'pulls') {
+        isValid = item.pull_request;
+      }
+      if (isValid && milestone) {
+        isValid = item.milestone && milestone === item.milestone.title;
+      }
+
+      if (isValid && assignees) {
+        if (!item.assignees || !item.assignees.length) {
+          isValid = false;
+        } else {
+          isValid = item.assignees.some((assignee) => {
+            return assignees
+              .split(',')
+              .find(login => login === assignee.login);
+          })
+        }
+      }
+      return isValid;
+    }).map(item => {
+      const { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } } = item;
+      return { id, title, state, url, html_url, locked, number, created_at, closed_at, merged_at, user: { login, avatar_url } };
+    });
+
     console.log('github.service.handler.repos.entity', 'process completed');
     return response || [];
   });
