@@ -181,7 +181,7 @@ exports.handler = async (event, context) => {
       });
     });
     
-    const response = gitHubResponse.filter(item => {
+    const response = !gitHubResponse ? [] : gitHubResponse.filter(item => {
       let isValid = true;
       if (entity === 'issues') {
         isValid = !item.pull_request;
@@ -211,7 +211,7 @@ exports.handler = async (event, context) => {
     });
 
     console.log('github.service.handler.repos.entity', 'process completed');
-    return response || [];
+    return response;
   });
 
   const getHeader = (authorization, eTag) => {
