@@ -1,9 +1,11 @@
 const Response = require('../shared/response');
+const EmailService = require('../services/email.service');
 const UserService = require('./user.service');
 const UserSourceService = require('./userSource.service');
+const ContactService = require('../contact/contact.service');
 const TokenService = require('./token.service');
 const DashboardService = require('../dashboard/dashboard.service');
-const { Dashboard, User, Token, UserSource } = require('../shared/model/dynamodb.model');
+const { Dashboard, User, Token, UserSource, Contact } = require('../shared/model/dynamodb.model');
 const { GITHUB_SOURCE_ID } = require('../shared/sources');
 const { encrypt } = require('../services/encrypt.service')
 
@@ -14,6 +16,8 @@ class UserHandler {
     this.userSourceService = new UserSourceService(logger);
     this.dashboardService = new DashboardService(logger);
     this.tokenService = new TokenService(logger);
+    this.contactService = new ContactService(logger);
+    this.emailService = new EmailService(logger);
   }
 
   async get(req, res) {
@@ -34,6 +38,27 @@ class UserHandler {
       dashboardId: user.dashboardId
     }));
     req.log.debug('UserHandler.updateDashboard', 'Process completed');
+  }
+
+  async sendEmail(req, res) {
+    req.log.debug('UserHandler.sendEmail', 'Process started');
+    const { userId } = req.params;
+    const { authorization } = req.headers;
+    const token = authorization.replace('Bearer', '').trim();
+    const user = await this.tokenService.getOne(token, userId);
+    if (!user) {
+      throw new Error('Invalid token');
+    }
+    const contact = new Contact({
+      ...req.body,
+      email: user.email,
+      userId,
+      authenticated: true
+    });
+    const contactDB = await this.contactService.add(contact);
+    const data = await this.emailService.sendEmail(contactDB);
+    res.json(new Response(data));
+    req.log.debug('UserHandler.sendEmail', 'Process completed');
   }
 
   async login(req, res) {

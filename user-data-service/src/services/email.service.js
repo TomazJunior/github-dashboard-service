@@ -34,8 +34,9 @@ class EmailService {
           email: ${contact.email}
           name: ${contact.name}
           userId: ${contact.userId}
+          authenticated: ${contact.authenticated}
           resolved: ${contact.resolved}
-  
+
           Message
           =======
           ${contact.message}

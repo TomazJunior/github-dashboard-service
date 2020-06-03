@@ -53,7 +53,6 @@ exports.handler = async (event, context) => {
     );
     if (githubRequest && result.status === 304) {
       console.log('github.service.githubRequester', 'process completed Not Modified');
-      console.log('githubRequest', githubRequest);
       return githubRequest.value;
     }
 
