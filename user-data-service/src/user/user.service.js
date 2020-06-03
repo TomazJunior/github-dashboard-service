@@ -34,6 +34,24 @@ class UserService {
         });
     }
 
+    async getOneByEmail(email) {
+        this.logger.debug('UserService.getOneByEmail', 'process started');
+        return new Promise((resolve, reject) => {
+            User
+            .query(email)
+            .usingIndex('EmailIndex')
+            .loadAll()
+            .exec((err, data) => {
+                if (err) {
+                    this.logger.debug('UserService.getOneByEmail', 'process failed');
+                    return reject(err);
+                };
+                resolve(data && data.Items && data.Items.length && data.Items[0].get());
+                this.logger.debug('UserService.getOneByEmail', 'process completed');
+            });
+        });        
+    }
+
     async update(id, properties) {
         this.logger.debug('UserService.update', 'process started');
         return new Promise((resolve, reject) => {

@@ -1,6 +1,7 @@
 const dynogels = require('dynogels');
 const joi = require('joi');
 const { GITHUB_SOURCE_ID } = require('../sources');
+const { DEFAULT_CONTACT_EMAIL } = require('../constants');
 
 const DashboardSchema = {
   id: dynogels.types.uuid(),
@@ -33,6 +34,25 @@ const Card = dynogels.define(process.env.cardsTableName, {
   timestamps: true,
   schema: CardSchema,
   tableName: process.env.cardsTableName
+});
+
+const ContactSchema = {
+  id: dynogels.types.uuid(),
+  email: joi.string().allow('', null).empty(['', null]).default(DEFAULT_CONTACT_EMAIL),
+  name: joi.string().allow(null),
+  subject: joi.string().allow(null),
+  message: joi.string().allow(null),
+  userId: joi.string().allow(null),
+  resolved: joi.boolean().default(false),
+  authenticated: joi.boolean().default(false)
+};
+
+const Contact = dynogels.define(process.env.contactsTableName, {
+  hashKey: 'email',
+  rangeKey: 'id',
+  timestamps: true,
+  schema: ContactSchema,
+  tableName: process.env.contactsTableName
 });
 
 const TokenSchema = {
@@ -93,6 +113,7 @@ const User = dynogels.define(process.env.usersTableName, {
 
 module.exports = {
   Card,
+  Contact,
   Dashboard,
   Token,
   User,

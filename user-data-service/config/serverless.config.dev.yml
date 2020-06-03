@@ -7,8 +7,13 @@ dashboardsTableName: dashboards-dev
 cardsTableName: cards-dev
 usersTableName: users-dev
 userSourcesTableName: user-sources-dev
+contactsTableName: contacts-dev
 tokensTableName: tokens-dev
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
+adminEmail: ""
+supportEmail: ""
+emailPwd: ""
 LoggerLevel: debug
 LoggerStack: true
+

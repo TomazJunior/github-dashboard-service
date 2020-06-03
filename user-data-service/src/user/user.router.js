@@ -12,6 +12,11 @@ const initialize = (router) => {
         return userHandler.updateDashboard(req, res);
     });
 
+    router.put('user/:userId/email', (req, res) => {
+        const userHandler = new UserHandler(req.log);
+        return userHandler.updateDashboard(req, res);
+    });
+
     router.post('user/login', (req, res) => {
         const userHandler = new UserHandler(req.log);
         return userHandler.login(req, res);

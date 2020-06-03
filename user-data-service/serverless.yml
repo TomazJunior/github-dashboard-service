@@ -25,9 +25,13 @@ provider:
     usersTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):usersTableName}
     userSourcesTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):userSourcesTableName}
     tokensTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):tokensTableName}
+    contactsTableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):contactsTableName}
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
+    adminEmail: ${file(./config/serverless.config.${self:custom.currentStage}.yml):adminEmail}
+    supportEmail: ${file(./config/serverless.config.${self:custom.currentStage}.yml):supportEmail}
+    emailPwd: ${file(./config/serverless.config.${self:custom.currentStage}.yml):emailPwd}
     LoggerLevel: ${file(./config/serverless.config.${opt:stage,self:custom.defaultStage}.yml):LoggerLevel}
     LoggerStack: ${file(./config/serverless.config.${opt:stage,self:custom.defaultStage}.yml):LoggerStack}    
   apiGateway:
@@ -50,7 +54,10 @@ functions:
           path: /user/{proxy+}
           method: any
           cors: true
-
+      - http:
+          path: /contact/{proxy+}
+          method: any
+          cors: true
 resources:
   Resources:
     DashboardsTableName:
@@ -182,6 +189,36 @@ resources:
                 AttributeName: externalToken
                 KeyType: HASH
             Projection:
-              ProjectionType: ALL             
+              ProjectionType: ALL      
+    ContactsTableName:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):contactsTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: "email"
+            AttributeType: "S"       
+          -
+            AttributeName: "id"
+            AttributeType: "S"      
+          -
+            AttributeName: "userId"
+            AttributeType: "S"                             
+        KeySchema:
+          -
+            AttributeName: "email"
+            KeyType: "HASH"   
+          -
+            AttributeName: "id"
+            KeyType: "RANGE"                          
+        BillingMode: PAY_PER_REQUEST    
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - 
+                AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL                     
 plugins:
  - serverless-offline
