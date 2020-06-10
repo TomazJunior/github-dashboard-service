@@ -24,6 +24,10 @@ provider:
     dynamoDBEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBEndpoint}
     dynamoDBaccessKey: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessKey}
     dynamoDBaccessSecret: ${file(./config/serverless.config.${self:custom.currentStage}.yml):dynamoDBaccessSecret}    
+    githubAppName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubAppName}    
+    githubClientId: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubClientId}
+    githubClientSecretId: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubClientSecretId}
+    userDataServiceEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):userDataServiceEndpoint}
   apiGateway:
     restApiId: ${cf:apigateway-service-dev.ApiGatewayId}
     restApiRootResourceId: ${cf:apigateway-service-dev.ApiGatewayRootResourceId}

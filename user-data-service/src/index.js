@@ -32,7 +32,11 @@ exports.handler = async (event, context) => {
   router.use((error, req, res, next) => {
     req.log.error(error);
     res.cors();
-    res.status(error.statusCode || 500).send({error: error.message});
+    res.status(
+      error.statusCode || 
+      (error.response && error.response.status) 
+      || 500)
+    .send({error: error.message});
     next();
   });
 

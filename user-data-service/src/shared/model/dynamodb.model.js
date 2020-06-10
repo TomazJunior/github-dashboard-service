@@ -59,6 +59,9 @@ const TokenSchema = {
   token: joi.string().required(),
   userId: joi.string().required(),
   externalToken: joi.string().required(),
+  expiresIn: joi.string().allow(null),
+  refreshToken: joi.string().allow(null),
+  refreshTokenExpiresIn: joi.string().allow(null),
   sourceId: joi.string().default(GITHUB_SOURCE_ID),
   destroyedAt: joi.date()
 }
@@ -77,7 +80,8 @@ const Token = dynogels.define(process.env.tokensTableName, {
 const UserSourceSchema = {
   id: joi.string().required(),
   sourceId: joi.string().default(GITHUB_SOURCE_ID),
-  userId: joi.string().required()
+  userId: joi.string().required(),
+  installationId: joi.string().allow(null),
 };
 
 const UserSource = dynogels.define(process.env.userSourcesTableName, {

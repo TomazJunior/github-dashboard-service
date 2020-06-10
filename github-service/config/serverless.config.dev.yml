@@ -6,3 +6,8 @@ githubRequestsTableName: github-requests-dev
 dynamoDBEndpoint: https://dynamodb.us-east-1.amazonaws.com/
 dynamoDBaccessKey: ""
 dynamoDBaccessSecret: ""
+githubAppName: "dashboard-github-app-dev"
+githubClientId: "" 
+githubClientSecretId: ""
+userDataServiceEndpoint: https://c4iezpk8af.execute-api.us-east-1.amazonaws.com/dev/user
+

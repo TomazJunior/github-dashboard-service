@@ -16,4 +16,6 @@ supportEmail: ""
 emailPwd: ""
 LoggerLevel: debug
 LoggerStack: true
+githubAppName: "dashboard-github-app-dev"
+authenticationServiceEndpoint: https://c4iezpk8af.execute-api.us-east-1.amazonaws.com/dev/auth
 

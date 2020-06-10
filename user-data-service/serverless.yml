@@ -32,6 +32,8 @@ provider:
     adminEmail: ${file(./config/serverless.config.${self:custom.currentStage}.yml):adminEmail}
     supportEmail: ${file(./config/serverless.config.${self:custom.currentStage}.yml):supportEmail}
     emailPwd: ${file(./config/serverless.config.${self:custom.currentStage}.yml):emailPwd}
+    githubAppName: ${file(./config/serverless.config.${self:custom.currentStage}.yml):githubAppName}
+    authenticationServiceEndpoint: ${file(./config/serverless.config.${self:custom.currentStage}.yml):authenticationServiceEndpoint}
     LoggerLevel: ${file(./config/serverless.config.${opt:stage,self:custom.defaultStage}.yml):LoggerLevel}
     LoggerStack: ${file(./config/serverless.config.${opt:stage,self:custom.defaultStage}.yml):LoggerStack}    
   apiGateway:
@@ -53,11 +55,31 @@ functions:
       - http:
           path: /user/{proxy+}
           method: any
-          cors: true
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
       - http:
           path: /contact/{proxy+}
           method: any
-          cors: true
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - Content-Length
+              - X-Requested-With
+              - User-Id
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 resources:
   Resources:
     DashboardsTableName:

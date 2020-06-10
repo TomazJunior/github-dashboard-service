@@ -12,9 +12,19 @@ const initialize = (router) => {
         return userHandler.updateDashboard(req, res);
     });
 
+    router.put('user/:userId/source/:sourceId', (req, res) => {
+        const userHandler = new UserHandler(req.log);
+        return userHandler.updateSource(req, res);
+    });
+
     router.post('user/:userId/email', (req, res) => {
         const userHandler = new UserHandler(req.log);
         return userHandler.sendEmail(req, res);
+    });
+
+    router.post('user/refresh', (req, res) => {
+        const userHandler = new UserHandler(req.log);
+        return userHandler.refresh(req, res);
     });
 
     router.post('user/login', (req, res) => {
@@ -27,6 +37,10 @@ const initialize = (router) => {
         return userHandler.logout(req, res);
     });
 
+    router.get('user/:userId/token', async(req, res) => {
+        const userHandler = new UserHandler(req.log);
+        return userHandler.getToken(req, res);
+    });
 };
 
 module.exports = initialize;

@@ -20,6 +20,19 @@ class UserSourceService {
         });
     }
 
+    async update(id, sourceId, properties) {
+      this.logger.debug('UserSourceService.update', 'process started');
+      return new Promise((resolve, reject) => {
+          return UserSource.update({...properties, id, sourceId}, (err, data) => {
+              if (err) {
+                  this.logger.debug('UserSourceService.update', 'process failed');
+                  return reject(err);
+              };
+              resolve(data && data.get());
+              this.logger.debug('UserSourceService.update', 'process completed');
+          });
+      });
+  }
 
     async getOne(id, sourceId) {
       this.logger.debug('UserSourceService.getOne', `process started id -> ${id}, sourceId -> ${sourceId}`);
@@ -34,6 +47,26 @@ class UserSourceService {
           this.logger.debug('UserSourceService.getOne', 'process completed');
         });
       });
+    }
+
+    async getByUserId(userId) {
+      this.logger.debug('UserSourceService.getByUserId', 'process started');
+      return new Promise((resolve, reject) => {
+        UserSource
+          .query(userId)
+          .usingIndex('UserIdIndex')
+          .loadAll()
+          .exec((err, data) => {
+              if (err) {
+                  this.logger.debug('UserSourceService.getByUserId', 'process failed');
+                  return reject(err);
+              };
+              resolve(data && data.Items && data.Items.length && data.Items.map((item) => {
+                return item.get();
+              }));
+              this.logger.debug('UserSourceService.getByUserId', 'process completed');
+          });
+      });        
     }
 };
 

@@ -2,8 +2,8 @@
 const axios = require('axios');
 const DynamoDBService = require('./services/dynamodb.service');
 const GithubRequestService = require('./services/githubRequest.service');
+const UserDataService = require('./services/userData.service');
 const { GithubRequest } = require('./model/dynamodb.model');
-const { decrypt } = require('./encrypt.service');
 
 //TODO: update to multiple files (router, handler, service)
 exports.handler = async (event, context) => {
@@ -26,28 +26,45 @@ exports.handler = async (event, context) => {
   api.use((error, req, res, next) => {
     req.log.error(error);
     res.cors();
-    res.status(error.statusCode || 
-      (error.response && error.response.status) || 
-      500).send({error: error.message});
+    const statusCode = error.statusCode || 
+    (error.response && error.response.status) || 
+    500;
+    res.status(statusCode).send({error: error.message});
     next();
   });
 
-  const githubRequester = async (req, url, prepareData, headers)  => {
+  const githubRequester = async (req, url, prepareData, authorizationHeader, additionalHeaders)  => {
     console.log('github.service.githubRequester', 'process started');
+    additionalHeaders = additionalHeaders ? additionalHeaders : {};
     const { headers: { authorization } } = req;
-    const githubRequestService = new GithubRequestService(req.log);
+    const userId = req.headers['user-id'];
 
+    const githubRequestService = new GithubRequestService(req.log);
+    
     let githubRequest;
     if (authorization) {
       githubRequest = await githubRequestService.get(authorization, url);
     }
-    headers = headers ? headers : getHeader(authorization, githubRequest && githubRequest.etag);
+
+    let externalToken;
+    if (!authorizationHeader) {
+      const userDataService = new UserDataService(req.log);
+      const { data } = await userDataService.getToken(userId, authorization);
+      externalToken = data.externalToken;  
+    } else {
+      externalToken = authorization;
+    }
+    
+    let headers = authorizationHeader ? 
+      authorizationHeader : 
+      getHeader(externalToken, githubRequest && githubRequest.etag, additionalHeaders);
+
     const result = await axios.get(
       url, 
       {
         ...headers,
         validateStatus: (status) => {
-          return status < 400
+          return status < 400;
         }
       }
     );
@@ -76,6 +93,28 @@ exports.handler = async (event, context) => {
     console.log('github.service.githubRequester', 'process completed');
     return response;
   }
+
+  api.get('/github/user/installed', async (req, res) => {
+    console.log('github.service.handler.user.installations', 'process started');
+    const { githubAppName } = process.env;
+    const url = 'https://api.github.com/user/installations';
+    const response = await githubRequester(req, url, (data) => {
+      return {
+        total_count: data.total_count,
+        installations: data.installations.map(i => {
+          return { app_slug: i.app_slug, id: i.id }
+        })
+      };
+    }, undefined, {
+      Accept: 'application/vnd.github.machine-man-preview+json'
+    });
+    const instalation = response.installations.find(item => item.app_slug === githubAppName);
+    console.log('github.service.handler.user.installations', 'process completed');
+    return {
+      isInstalled: !!instalation,
+      installationId: instalation ? instalation.id : undefined
+    };
+  });
 
   api.get('/github/user/repos', async (req, res) => {
     console.log('github.service.handler.user.repos', 'process started');
@@ -213,11 +252,12 @@ exports.handler = async (event, context) => {
     return response;
   });
 
-  const getHeader = (authorization, eTag) => {
+  const getHeader = (authorization, eTag, additionalHeaders) => {
     console.log('github.service.getHeader', 'process started');
     const header = { 
       headers: { 
-        authorization: `Bearer ${decrypt(authorization.replace('Bearer', '').trim())}`
+        authorization: `Bearer ${authorization}`,
+        ...additionalHeaders
       }
     };
     if (eTag) {
