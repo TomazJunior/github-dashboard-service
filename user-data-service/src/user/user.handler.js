@@ -153,7 +153,6 @@ class UserHandler {
     const { data } = await axios.post(`${authenticationServiceEndpoint}/refresh`, {
       ...tokenDB
     });    
-    // const token = encrypt(data.access_token);
     await this.tokenService.update(accessToken, userId, {
       expiresIn: data.expires_in,
       refreshTokenExpiresIn: data.refresh_token_expires_in,
