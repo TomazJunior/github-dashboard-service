@@ -10,7 +10,7 @@ const { Dashboard, User, Token, UserSource, Contact } = require('../shared/model
 const { GITHUB_SOURCE_ID } = require('../shared/sources');
 const { encrypt } = require('../services/encrypt.service')
 const axios = require('axios');
-
+const moment = require('moment');
 class UserHandler {
   
   constructor(logger) {
@@ -135,7 +135,8 @@ class UserHandler {
     res.json(new Response({
       ...user,
       token: internalToken,
-      installAppUrl: `https://github.com/apps/${process.env.githubAppName}/installations/new/permissions?suggested_target_id=${id}`
+      installAppUrl: `https://github.com/apps/${process.env.githubAppName}/installations/new/permissions?suggested_target_id=${id}`,
+      expiresIn: userDataBody.expires_in 
     }));
     req.log.debug('UserHandler.login', 'Process completed');
   }
@@ -166,7 +167,7 @@ class UserHandler {
 
     await this.tokenService.remove(accessToken, userId);
 
-    res.json(new Response({ access_token: token }));
+    res.json(new Response({ access_token: token, expiresIn: data.expires_in }));
     req.log.debug('UserHandler.refresh', 'Process completed');
   }
 

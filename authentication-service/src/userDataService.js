@@ -14,9 +14,9 @@ const login = async (accessToken, userLoginData, user) => {
       refreshTokenExpiresIn: refresh_token_expires_in
     }
   }, {...getHeaders(accessToken)});
-  const { id, email, name, type, location, avatarUrl, dashboardId, token, installAppUrl } = data;
+  const { id, email, name, type, location, avatarUrl, dashboardId, token, installAppUrl, expiresIn } = data;
   console.log('userDataService.login', 'process completed');
-  return { id, email, name, type, location, avatarUrl, dashboardId, access_token: token, installAppUrl };
+  return { id, email, name, type, location, avatarUrl, dashboardId, access_token: token, installAppUrl, expiresIn: expires_in };
 };
 
 const logout = async (headers) => 

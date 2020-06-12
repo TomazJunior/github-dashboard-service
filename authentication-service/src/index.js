@@ -40,11 +40,22 @@ exports.handler = async (event, context) => {
     const authenticatedUser = await getAuthenticatedUser(parsedData.access_token);
     const userData = await login(parsedData.access_token, parsedData, authenticatedUser);
     console.log('authentication.handler.login', 'process completed');
-    return {
+    const response = {
       ...parsedData,
       ...authenticatedUser,
       ...userData
     };
+    return {
+      access_token: response.access_token,
+      avatarUrl: response.avatarUrl,
+      dashboardId: response.dashboardId,
+      email: response.email,
+      id: response.id,
+      installAppUrl: response.installAppUrl,
+      location: response.location,
+      name: response.name,
+      expiresIn: response.expiresIn
+    }
   });
 
   api.post('/auth/logout', async (req, res) => {
