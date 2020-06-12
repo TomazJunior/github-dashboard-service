@@ -4,6 +4,7 @@ const DynamoDBService = require('./services/dynamodb.service');
 const GithubRequestService = require('./services/githubRequest.service');
 const UserDataService = require('./services/userData.service');
 const { GithubRequest } = require('./model/dynamodb.model');
+const { decrypt } = require('./encrypt.service');
 
 //TODO: update to multiple files (router, handler, service)
 exports.handler = async (event, context) => {
@@ -33,7 +34,7 @@ exports.handler = async (event, context) => {
     next();
   });
 
-  const githubRequester = async (req, url, prepareData, authorizationHeader, additionalHeaders)  => {
+  const githubRequester = async (req, url, prepareData, headers, additionalHeaders)  => {
     console.log('github.service.githubRequester', 'process started');
     additionalHeaders = additionalHeaders ? additionalHeaders : {};
     const { headers: { authorization } } = req;
@@ -46,18 +47,7 @@ exports.handler = async (event, context) => {
       githubRequest = await githubRequestService.get(authorization, url);
     }
 
-    let externalToken;
-    if (!authorizationHeader) {
-      const userDataService = new UserDataService(req.log);
-      const { data } = await userDataService.getToken(userId, authorization);
-      externalToken = data.externalToken;  
-    } else {
-      externalToken = authorization;
-    }
-    
-    let headers = authorizationHeader ? 
-      authorizationHeader : 
-      getHeader(externalToken, githubRequest && githubRequest.etag, additionalHeaders);
+    headers = headers ? headers : getHeader(authorization, githubRequest && githubRequest.etag, additionalHeaders);
 
     const result = await axios.get(
       url, 
@@ -256,7 +246,7 @@ exports.handler = async (event, context) => {
     console.log('github.service.getHeader', 'process started');
     const header = { 
       headers: { 
-        authorization: `Bearer ${authorization}`,
+        authorization: `Bearer ${decrypt(authorization.replace('Bearer', '').trim())}`,
         ...additionalHeaders
       }
     };

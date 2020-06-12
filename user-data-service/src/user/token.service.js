@@ -73,7 +73,6 @@ class TokenService {
     async update(token, userId, properties) {
       this.logger.debug('TokenService.update', 'process started');
       return new Promise((resolve, reject) => {
-          console.log('====>', {...properties, token, userId});
           return Token.update({...properties, token, userId}, (err, data) => {
               if (err) {
                   this.logger.debug('TokenService.update', 'process failed');

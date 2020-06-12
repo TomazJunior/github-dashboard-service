@@ -153,14 +153,20 @@ class UserHandler {
     const { data } = await axios.post(`${authenticationServiceEndpoint}/refresh`, {
       ...tokenDB
     });    
-    await this.tokenService.update(accessToken, userId, {
+
+    const token = encrypt(data.access_token);
+    await this.tokenService.add(new Token({
+      userId,
+      token,
       expiresIn: data.expires_in,
       refreshTokenExpiresIn: data.refresh_token_expires_in,
       externalToken: data.access_token,
       refreshToken: data.refresh_token
-    });
+    }));
 
-    res.json(new Response({status: 'ok'}));
+    await this.tokenService.remove(accessToken, userId);
+
+    res.json(new Response({ access_token: token }));
     req.log.debug('UserHandler.refresh', 'Process completed');
   }
 
@@ -175,7 +181,7 @@ class UserHandler {
         req.log.debug('UserHandler.logout', 'Process completed');
         return new Response();
       }
-      await this.tokenService.update(accessToken, tokenDB.userId, {destroyedAt: new Date()});
+      await this.tokenService.remove(accessToken, tokenDB.userId);
       res.json(new Response());
       req.log.debug('UserHandler.logout', 'Process completed');
     } else {
