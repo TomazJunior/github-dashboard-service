@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "aws-sdk": "^2.635.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dynogels": "^9.1.0",
     "joi": "^14.3.1",
     "lambda-api": "^0.10.5",
