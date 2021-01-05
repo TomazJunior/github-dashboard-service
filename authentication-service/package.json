@@ -4,7 +4,7 @@
   "description": "This service is in charge of the authentication",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "lambda-api": "^0.10.5"
   },
   "devDependencies": {
