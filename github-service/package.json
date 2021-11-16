@@ -4,7 +4,7 @@
   "description": "This service is in charge of the github requests",
   "main": "index.js",
   "dependencies": {
-    "aws-sdk": "^2.683.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.19.2",
     "dynogels": "^9.1.0",
     "joi": "^14.3.1",
